@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>265</width>
+    <height>276</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>gost-crypto-gui</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>gost-crypto-gui.png</normaloff>gost-crypto-gui.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QPushButton" name="btnSign">
+      <property name="statusTip">
+       <string>Подписать указанный файл</string>
+      </property>
+      <property name="text">
+       <string>Подписать файл(ы)</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="btnVerify">
+      <property name="statusTip">
+       <string>Проверить ЭЦП подписанного файла</string>
+      </property>
+      <property name="text">
+       <string>Проверить подпись</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="btnEncrypt">
+      <property name="statusTip">
+       <string>Зашифровать указанный файл</string>
+      </property>
+      <property name="text">
+       <string>Зашифровать файл(ы)</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="btnDecrypt">
+      <property name="statusTip">
+       <string>Расшифровать файл</string>
+      </property>
+      <property name="text">
+       <string>Расшифровать файл(ы)</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>265</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Опции</string>
+    </property>
+    <widget class="QMenu" name="cryptoprovider">
+     <property name="statusTip">
+      <string>Выбрать используемый криптопровайдер</string>
+     </property>
+     <property name="title">
+      <string>Криптопровайдер</string>
+     </property>
+     <addaction name="action_CSP"/>
+     <addaction name="actionOpenSSL"/>
+    </widget>
+    <widget class="QMenu" name="encoding">
+     <property name="title">
+      <string>Кодировка файлов</string>
+     </property>
+     <addaction name="actionDER"/>
+     <addaction name="actionBase64"/>
+    </widget>
+    <addaction name="cryptoprovider"/>
+    <addaction name="encoding"/>
+   </widget>
+   <addaction name="menu"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_CSP">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>КриптоПро CSP</string>
+   </property>
+  </action>
+  <action name="actionOpenSSL">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>OpenSSL</string>
+   </property>
+  </action>
+  <action name="actionDER">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>DER</string>
+   </property>
+  </action>
+  <action name="actionBase64">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>base64</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

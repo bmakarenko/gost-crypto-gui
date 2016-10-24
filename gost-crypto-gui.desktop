@@ -1,0 +1,14 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Encoding=UTF-8
+Name=gost-crypto-gui
+Name[ru]=Подпись и шифрование файлов
+Comment[ru]=Графический интерфейс пользователя для подписи и шифрования файлов при помощи алгоритмов ГОСТ
+Exec=python /usr/bin/gost-crypto-gui.py
+Terminal=false
+Type=Application
+Icon=gost-crypto-gui
+StartupNotify=true
+X-Desktop-File-Install-Version=0.15
+Categories=Qt;HardwareSettings;Settings;System;
