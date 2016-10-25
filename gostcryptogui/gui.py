@@ -46,7 +46,6 @@ THE SOFTWARE.
 import ConfigParser
 
 from mainwindow import *
-import sys
 from cprocsp import *
 from selectcert import *
 from viewcert import *

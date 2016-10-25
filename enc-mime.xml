@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+ <mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
+   <mime-type type="application/x-extension-enc">
+   <comment>PKCS #7 MIME Message</comment>
+   <comment xml:lang="ru">Сообщение MIME PKCS #7</comment>
+   <glob pattern="*.enc"/>
+  </mime-type>
+ </mime-info>
