@@ -274,14 +274,3 @@ class Window(QtGui.QMainWindow):
                                   u"<br>E-mail: <a href='mailto:makarenko@r24.fssprus.ru'>makarenko@r24.fssprus.ru</a>"
                                   u"<br> <a href='mailto:bmakarenko90@gmail.com'>bmakarenko90@gmail.com</a><br><br>"
                                   u"<a href='http://opensource.org/licenses/MIT'>Лицензия MIT</a>")
-
-
-def main():
-    app = QtGui.QApplication(sys.argv)
-    ex = Window()
-    ex.show()
-    sys.exit(app.exec_())
-
-
-if __name__ == '__main__':
-    main()

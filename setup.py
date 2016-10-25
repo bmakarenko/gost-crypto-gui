@@ -8,4 +8,4 @@ setup(name='gostcryptogui',
       author_email='bmakarenko90@gmail.com',
       license='MIT',
       packages=['gostcryptogui'],
-      zip_safe=False)
+      zip_safe=False, install_requires=['PyQt4'])

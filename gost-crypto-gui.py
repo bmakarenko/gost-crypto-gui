@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from gostcryptogui import *
-from PyQt4 import QtCore, QtGui
+from gostcryptogui import gui
+from PyQt4 import QtGui
+
 
 def main():
     app = QtGui.QApplication(sys.argv)
@@ -22,8 +23,16 @@ def main():
         ex.verify(True, sys.argv[2].decode('utf-8'))
     elif sys.argv[1] == '-decr':
         ex.decrypt(sys.argv[2].decode('utf-8'))
+    elif sys.argv[1] == '--help':
+        print 'Использование: gost-crypto-gui.py [КЛЮЧ] [ФАЙЛ]'
+        print 'Выполняет криптографические операции над файлами при помощи алгоритмов ГОСТ\n'
+        print 'Ключи:\n'
+        print '-sign\t\tПодписать файл'
+        print '-encr\t\tЗашифровать файл'
+        print '-verify\t\tПроверить электронную подпись файла'
+        print '-dettach\tОтсоединить электронную подпись от файла'
+        print '-decr\t\tРасшифровать файл'
 
 
 if __name__ == '__main__':
     main()
-
