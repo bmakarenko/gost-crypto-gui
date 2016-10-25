@@ -100,7 +100,7 @@ class DettachMenuProvider(nautilus.MenuProvider):
         if filename[-3:] != 'sig':
             return
 
-        itemVerify = nautilus.MenuItem('VerifyMenuProvider::Verify',
+        itemVerify = nautilus.MenuItem('DettachMenuProvider::Dettach',
                                        'Отсоединить подпись',
                                        'Отсоединить подпись %s' % filename)
 
