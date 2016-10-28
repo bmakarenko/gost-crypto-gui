@@ -138,10 +138,12 @@ class CryptoPro:
             r'\d+-{7}\nIssuer.*?: (.+?)\n.*?Subject.*?: (.+?)\n.*?SHA1 Hash.*?0x(.+?)\nNot valid before.*?(\d.+?)UTC\nNot valid after.*?(\d.+?)UTC.+?PrivateKey Link.*?(Yes|No).*?\n',
             output, re.MULTILINE + re.DOTALL)
         for cert in m:
-            issuerDN = dict(i.split("=") for i in cert[0].split(", "))
-            issuerCN = issuerDN['CN'].decode('utf-8')
-            subjectDN = dict(i.split("=") for i in cert[1].split(", "))
-            subjectCN = subjectDN['CN'].decode('utf-8')
+            issuerDN = dict(re.findall(ur'([A-Z0-9\.]+?)=("?[\w \.\,0-9@\-\#\/\"]+"?)(?:, |$)',
+                                       cert[0].decode('utf-8'), re.UNICODE))
+            issuerCN = issuerDN['CN']
+            subjectDN = dict(re.findall(ur'([A-Z0-9\.]+?)=("?[\w \.\,0-9@\-\#\/\"]+"?)(?:, |$)',
+                                        cert[1].decode('utf-8'), re.UNICODE))
+            subjectCN = subjectDN['CN']
             secretKey = cert[5]
             thumbprint = cert[2]
             notValidBefore = cert[3]

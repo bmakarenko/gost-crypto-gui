@@ -1,4 +1,5 @@
 #!/bin/bash
+rm -f gostcryptogui/*.pyc
 mkdir -p ~/rpmbuild/SPEC ~/rpmbuild/SOURCES
 tar -czf ~/rpmbuild/SOURCES/gostcryptogui.tar.gz gostcryptogui
 cp gostcryptogui.spec ~/rpmbuild/SPEC/
