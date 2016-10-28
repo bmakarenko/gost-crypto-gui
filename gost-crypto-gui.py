@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os.path
 from gostcryptogui import gui
 from PyQt4 import QtGui
 
@@ -23,6 +24,11 @@ def main():
         ex.verify(True, sys.argv[2].decode('utf-8'))
     elif sys.argv[1] == '-decr':
         ex.decrypt(sys.argv[2].decode('utf-8'))
+    elif os.path.isfile(sys.argv[1]):
+        if sys.argv[1][-4:] == '.enc':
+            ex.decrypt(sys.argv[1].decode('utf-8'))
+        elif sys.argv[1][-4:] == '.sig':
+            ex.verify(True, sys.argv[1].decode('utf-8'))
     elif sys.argv[1] == '--help':
         print 'Использование: gost-crypto-gui.py [КЛЮЧ] [ФАЙЛ]'
         print 'Выполняет криптографические операции над файлами при помощи алгоритмов ГОСТ\n'
