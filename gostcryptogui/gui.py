@@ -190,7 +190,7 @@ class Window(QtGui.QMainWindow):
             file_names = args
         for filename in file_names:
             try:
-                signer, chain = CryptoPro().verify(unicode(filename), dettach)
+                signer, chain, revoked = CryptoPro().verify(unicode(filename), dettach)
                 cert_view = ViewCert()
                 item = QtGui.QListWidgetItem(cert_view.ui.cert_listview)
                 label = QtGui.QLabel()
@@ -210,7 +210,14 @@ class Window(QtGui.QMainWindow):
                 if chain:
                     label.setText(u'<font color="green"><b>Цепочка сертификатов была проверена.</b></font>')
                 else:
-                    label.setText(u'<font color="red"><b>Цепочка сертификатов не была проверена.</b></font>')
+                    label.setText(u'<font color="red"><b>ВНИМАНИЕ: Цепочка сертификатов не была проверена.</b></font>')
+                cert_view.ui.cert_listview.setItemWidget(item, label)
+                item = QtGui.QListWidgetItem(cert_view.ui.cert_listview)
+                label = QtGui.QLabel()
+                if revoked:
+                    label.setText(u'<font color="red"><b>ВНИМАНИЕ: Один или несколько сертификатов в цепочке отозваны!</b></font>')
+                elif chain:
+                    label.setText(u'<font color="green"><b>Сертификат действителен.</b></font>')
                 cert_view.ui.cert_listview.setItemWidget(item, label)
                 cert_view.exec_()
             except Exception as error:
@@ -230,14 +237,14 @@ class Window(QtGui.QMainWindow):
             return
         for filename in file_names:
             try:
-                encrypted, chain = CryptoPro().encrypt(thumbprint, unicode(filename), self.encoding)
+                encrypted, chain, revoked = CryptoPro().encrypt(thumbprint, unicode(filename), self.encoding)
                 if encrypted:
-                    if chain:
-                        QtGui.QMessageBox().information(self, u"Cообщение", u"Файл %s успешно зашифрован" % unicode(filename))
-                    else:
-                        QtGui.QMessageBox().information(self, u"Cообщение",
-                                                        u"Файл %s успешно зашифрован, "
-                                                        u"но статус отзыва сертификата не был проверен" % unicode(filename))
+                    message = u'Файл %s успешно зашифрован.\n' % unicode(filename)
+                    if not chain:
+                        message += u'ВНИМАНИЕ: Статус отзыва сертификата не был проверен!\n'
+                    if revoked:
+                        message += u'ВНИМАНИЕ: Один или несколько сертификатов в цепочке отозваны!\n'
+                    QtGui.QMessageBox().information(self, u"Cообщение", message)
             except Exception as error:
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
 
@@ -255,14 +262,14 @@ class Window(QtGui.QMainWindow):
             return
         for filename in file_names:
             try:
-                decrypted, chain = CryptoPro().decrypt(thumbprint, unicode(filename))
+                decrypted, chain, revoked = CryptoPro().decrypt(thumbprint, unicode(filename))
                 if decrypted:
-                    if chain:
-                        QtGui.QMessageBox().information(self, u"Cообщение", u"Файл %s успешно расшифрован" % unicode(filename))
-                    else:
-                        QtGui.QMessageBox().information(self, u"Cообщение",
-                                                        u"Файл %s успешно расшифрован, "
-                                                        u"но статус отзыва сертификата не был проверен" % unicode(filename))
+                    message = u'Файл %s успешно расшифрован.\n' % unicode(filename)
+                    if not chain:
+                        message += u'ВНИМАНИЕ: Статус отзыва сертификата не был проверен!\n'
+                    if revoked:
+                        message += u'ВНИМАНИЕ: Один или несколько сертификатов в цепочке отозваны!\n'
+                    QtGui.QMessageBox().information(self, u"Cообщение", message)
             except Exception as error:
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
 

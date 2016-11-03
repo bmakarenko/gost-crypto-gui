@@ -91,8 +91,7 @@ class CryptoPro:
                   '0x20000130': u'Неверно указан номер',
                   '0x20000131': u'Нет используемых сертификатов',
                   '0x20000132': u'Данный сертификат не может применяться для этой операции',
-                  '0x20000133': u'Цепочка сертификатов не проверена. Установите требуемые корневые сертификаты и списки'
-                                u' отзыва сертификатов.',
+                  '0x20000133': u'Цепочка сертификатов не проверена. Либо сертификат был отозван.',
                   '0x20000134': u'Криптопровайдер, поддерживающий необходимый алгоритм не найден',
                   '0x20000135': u'Неудачный ввод пароля ключевого контейнера',
                   '0x20000136': u'Ошибка связи с закрытым ключом',
@@ -200,6 +199,8 @@ class CryptoPro:
         output = cryptcp.stdout.read()
         chainisverified = not 'The certificate revocation status or one of the certificates in the certificate chain ' \
                               'is unknown.' in output
+        chainisrevoked = 'Trust for this certificate or one of the certificates in the certificate chain has' \
+                         ' been revoked' in output
         m = re.search(r'Signer: (?P<signer>.+?)\n.*(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
                       re.MULTILINE + re.DOTALL)
         errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
@@ -207,7 +208,7 @@ class CryptoPro:
         if not errorcode == '0':
             raise Exception(self.error_description(errorcode))
         else:
-            return m.groupdict(), chainisverified
+            return m.groupdict(), chainisverified, chainisrevoked
 
     # Метод encrypt шифрует заданный файл(filepath), при помощи SHA-отпечатка сертификата(thumbprint),
     # и используя заданную кодировку(encoding): DER или BASE64
@@ -231,12 +232,14 @@ class CryptoPro:
         output = cryptcp.stdout.read()
         chainisverified = not 'The certificate revocation status or one of the certificates in the certificate chain ' \
                               'is unknown.' in output
+        chainisrevoked = 'Trust for this certificate or one of the certificates in the certificate chain has' \
+                         ' been revoked' in output
         errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
                               re.MULTILINE + re.DOTALL).groupdict()['errorcode']
         if not errorcode == '0':
             raise Exception(self.error_description(errorcode))
         else:
-            return True, chainisverified
+            return True, chainisverified, chainisrevoked
 
     # Метод decrypt расшифровывает заданный файл(filepath) при помощи SHA-отпечатка сертификата(thumbprint)
     # Расшифрованный файл сохраняется в той же директории, лишаясь расширения '.enc'
@@ -255,9 +258,11 @@ class CryptoPro:
         output = cryptcp.stdout.read()
         chainisverified = not 'The certificate revocation status or one of the certificates in the certificate chain ' \
                               'is unknown.' in output
+        chainisrevoked = 'Trust for this certificate or one of the certificates in the certificate chain has' \
+                         ' been revoked' in output
         errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
                               re.MULTILINE + re.DOTALL).groupdict()['errorcode']
         if not errorcode == '0':
             raise Exception(self.error_description(errorcode))
         else:
-            return True, chainisverified
+            return True, chainisverified, chainisrevoked
