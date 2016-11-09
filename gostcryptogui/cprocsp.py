@@ -197,9 +197,8 @@ class CryptoPro:
         # Согласиться
         cryptcp.stdin.write('Y')
         output = cryptcp.stdout.read()
-        chainisverified = (
-                          'The certificate revocation status or one of the certificates in the certificate chain is'
-                          ' unknown.' not in output) \
+        chainisverified = ('The certificate revocation status or one of the certificates in the certificate chain is'
+                           ' unknown.' not in output) \
                           and ('Certificate chain is not checked for this certificate' not in output)
         chainisrevoked = 'Trust for this certificate or one of the certificates in the certificate chain has' \
                          ' been revoked' in output
@@ -232,8 +231,8 @@ class CryptoPro:
         # Согласит
         cryptcp.stdin.write('Y')
         output = cryptcp.stdout.read()
-        chainisverified = ('The certificate revocation status or one of the certificates in the certificate chain'
-                           ' is unknown.' not in output) \
+        chainisverified = ('The certificate revocation status or one of the certificates in the certificate chain is'
+                           ' unknown.' not in output) \
                           and ('Certificate chain is not checked for this certificate' not in output)
         chainisrevoked = 'Trust for this certificate or one of the certificates in the certificate chain has' \
                          ' been revoked' in output
@@ -259,8 +258,8 @@ class CryptoPro:
         # Согласит
         cryptcp.stdin.write('Y')
         output = cryptcp.stdout.read()
-        chainisverified = ('The certificate revocation status or one of the certificates in the certificate chain'
-                           ' is unknown.' not in output) \
+        chainisverified = ('The certificate revocation status or one of the certificates in the certificate chain is'
+                           ' unknown.' not in output) \
                           and ('Certificate chain is not checked for this certificate' not in output)
         chainisrevoked = 'Trust for this certificate or one of the certificates in the certificate chain has' \
                          ' been revoked' in output
