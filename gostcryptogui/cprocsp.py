@@ -197,8 +197,10 @@ class CryptoPro:
         # Согласиться
         cryptcp.stdin.write('Y')
         output = cryptcp.stdout.read()
-        chainisverified = not 'The certificate revocation status or one of the certificates in the certificate chain ' \
-                              'is unknown.' in output
+        chainisverified = (
+                          'The certificate revocation status or one of the certificates in the certificate chain is'
+                          ' unknown.' not in output) \
+                          and ('Certificate chain is not checked for this certificate' not in output)
         chainisrevoked = 'Trust for this certificate or one of the certificates in the certificate chain has' \
                          ' been revoked' in output
         m = re.search(r'Signer: (?P<signer>.+?)\n.*(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
@@ -230,8 +232,9 @@ class CryptoPro:
         # Согласит
         cryptcp.stdin.write('Y')
         output = cryptcp.stdout.read()
-        chainisverified = not 'The certificate revocation status or one of the certificates in the certificate chain ' \
-                              'is unknown.' in output
+        chainisverified = ('The certificate revocation status or one of the certificates in the certificate chain'
+                           ' is unknown.' not in output) \
+                          and ('Certificate chain is not checked for this certificate' not in output)
         chainisrevoked = 'Trust for this certificate or one of the certificates in the certificate chain has' \
                          ' been revoked' in output
         errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
@@ -256,8 +259,9 @@ class CryptoPro:
         # Согласит
         cryptcp.stdin.write('Y')
         output = cryptcp.stdout.read()
-        chainisverified = not 'The certificate revocation status or one of the certificates in the certificate chain ' \
-                              'is unknown.' in output
+        chainisverified = ('The certificate revocation status or one of the certificates in the certificate chain'
+                           ' is unknown.' not in output) \
+                          and ('Certificate chain is not checked for this certificate' not in output)
         chainisrevoked = 'Trust for this certificate or one of the certificates in the certificate chain has' \
                          ' been revoked' in output
         errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
