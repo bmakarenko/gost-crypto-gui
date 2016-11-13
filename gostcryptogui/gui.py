@@ -183,14 +183,14 @@ class Window(QtGui.QMainWindow):
 
     def verify(self, dettach=False, *args):
         if self.sender():
-            file_names = QtGui.QFileDialog().getOpenFileNames(self, u"Выберите файл(ы)", "", "")
+            file_names = QtGui.QFileDialog().getOpenFileNames(self, u"Выберите файл(ы)", "", "*.sig")
             if not file_names:
                 return
         else:
             file_names = args
         for filename in file_names:
             try:
-                signer, chain, revoked = CryptoPro().verify(unicode(filename), dettach)
+                signer, chain, revoked, expired = CryptoPro().verify(unicode(filename), dettach)
                 cert_view = ViewCert()
                 item = QtGui.QListWidgetItem(cert_view.ui.cert_listview)
                 label = QtGui.QLabel()
@@ -210,12 +210,14 @@ class Window(QtGui.QMainWindow):
                 if chain:
                     label.setText(u'<font color="green"><b>Цепочка сертификатов была проверена.</b></font>')
                 else:
-                    label.setText(u'<font color="red"><b>ВНИМАНИЕ: Цепочка сертификатов не была проверена.</b></font>')
+                    label.setText(u'<font color="orange"><b>ВНИМАНИЕ: Цепочка сертификатов не была проверена.</b></font>')
                 cert_view.ui.cert_listview.setItemWidget(item, label)
                 item = QtGui.QListWidgetItem(cert_view.ui.cert_listview)
                 label = QtGui.QLabel()
                 if revoked:
                     label.setText(u'<font color="red"><b>ВНИМАНИЕ: Один или несколько сертификатов в цепочке отозваны!</b></font>')
+                elif expired:
+                    label.setText(u'<font color="red"><b>ВНИМАНИЕ: Срок действия сертификата истек или еще не наступил!</b></font>')
                 elif chain:
                     label.setText(u'<font color="green"><b>Сертификат действителен.</b></font>')
                 cert_view.ui.cert_listview.setItemWidget(item, label)
@@ -237,13 +239,15 @@ class Window(QtGui.QMainWindow):
             return
         for filename in file_names:
             try:
-                encrypted, chain, revoked = CryptoPro().encrypt(thumbprint, unicode(filename), self.encoding)
+                encrypted, chain, revoked, expired = CryptoPro().encrypt(thumbprint, unicode(filename), self.encoding)
                 if encrypted:
                     message = u'Файл %s успешно зашифрован.\n' % unicode(filename)
                     if not chain:
                         message += u'ВНИМАНИЕ: Статус отзыва сертификата не был проверен!\n'
                     if revoked:
                         message += u'ВНИМАНИЕ: Один или несколько сертификатов в цепочке отозваны!\n'
+                    if expired:
+                        message += u'ВНИМАНИЕ: Срок действия сертификата истек или еще не наступил!\n'
                     QtGui.QMessageBox().information(self, u"Cообщение", message)
             except Exception as error:
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
@@ -262,13 +266,15 @@ class Window(QtGui.QMainWindow):
             return
         for filename in file_names:
             try:
-                decrypted, chain, revoked = CryptoPro().decrypt(thumbprint, unicode(filename))
+                decrypted, chain, revoked, expired = CryptoPro().decrypt(thumbprint, unicode(filename))
                 if decrypted:
                     message = u'Файл %s успешно расшифрован.\n' % unicode(filename)
                     if not chain:
                         message += u'ВНИМАНИЕ: Статус отзыва сертификата не был проверен!\n'
                     if revoked:
                         message += u'ВНИМАНИЕ: Один или несколько сертификатов в цепочке отозваны!\n'
+                    if expired:
+                        message += u'ВНИМАНИЕ: Срок действия сертификата истек или еще не наступил!\n'
                     QtGui.QMessageBox().information(self, u"Cообщение", message)
             except Exception as error:
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
