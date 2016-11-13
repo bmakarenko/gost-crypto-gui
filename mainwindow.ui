@@ -67,7 +67,7 @@
      <x>0</x>
      <y>0</y>
      <width>265</width>
-     <height>20</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -91,8 +91,16 @@
      <addaction name="actionDER"/>
      <addaction name="actionBase64"/>
     </widget>
+    <widget class="QMenu" name="sign_check">
+     <property name="title">
+      <string>Авт. проверка подписи</string>
+     </property>
+     <addaction name="actionSignCheckOn"/>
+     <addaction name="actionSignCheckOff"/>
+    </widget>
     <addaction name="cryptoprovider"/>
     <addaction name="encoding"/>
+    <addaction name="sign_check"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -136,6 +144,25 @@
    </property>
    <property name="text">
     <string>base64</string>
+   </property>
+  </action>
+  <action name="actionSignCheckOn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Включено</string>
+   </property>
+  </action>
+  <action name="actionSignCheckOff">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Выключено</string>
    </property>
   </action>
  </widget>

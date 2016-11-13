@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Sun Oct 23 22:15:40 2016
-#      by: PyQt4 UI code generator 4.10.4
+# Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -28,7 +27,7 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(265, 276)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(_fromUtf8("/usr/share/pixmaps/gost-crypto-gui.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("gost-crypto-gui.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
@@ -48,7 +47,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.btnDecrypt)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 265, 20))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 265, 24))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menu = QtGui.QMenu(self.menubar)
         self.menu.setObjectName(_fromUtf8("menu"))
@@ -56,6 +55,8 @@ class Ui_MainWindow(object):
         self.cryptoprovider.setObjectName(_fromUtf8("cryptoprovider"))
         self.encoding = QtGui.QMenu(self.menu)
         self.encoding.setObjectName(_fromUtf8("encoding"))
+        self.sign_check = QtGui.QMenu(self.menu)
+        self.sign_check.setObjectName(_fromUtf8("sign_check"))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
@@ -75,12 +76,22 @@ class Ui_MainWindow(object):
         self.actionBase64 = QtGui.QAction(MainWindow)
         self.actionBase64.setCheckable(True)
         self.actionBase64.setObjectName(_fromUtf8("actionBase64"))
+        self.actionSignCheckOn = QtGui.QAction(MainWindow)
+        self.actionSignCheckOn.setCheckable(True)
+        self.actionSignCheckOn.setChecked(True)
+        self.actionSignCheckOn.setObjectName(_fromUtf8("actionSignCheckOn"))
+        self.actionSignCheckOff = QtGui.QAction(MainWindow)
+        self.actionSignCheckOff.setCheckable(True)
+        self.actionSignCheckOff.setObjectName(_fromUtf8("actionSignCheckOff"))
         self.cryptoprovider.addAction(self.action_CSP)
         self.cryptoprovider.addAction(self.actionOpenSSL)
         self.encoding.addAction(self.actionDER)
         self.encoding.addAction(self.actionBase64)
+        self.sign_check.addAction(self.actionSignCheckOn)
+        self.sign_check.addAction(self.actionSignCheckOff)
         self.menu.addAction(self.cryptoprovider.menuAction())
         self.menu.addAction(self.encoding.menuAction())
+        self.menu.addAction(self.sign_check.menuAction())
         self.menubar.addAction(self.menu.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -100,8 +111,11 @@ class Ui_MainWindow(object):
         self.cryptoprovider.setStatusTip(_translate("MainWindow", "Выбрать используемый криптопровайдер", None))
         self.cryptoprovider.setTitle(_translate("MainWindow", "Криптопровайдер", None))
         self.encoding.setTitle(_translate("MainWindow", "Кодировка файлов", None))
+        self.sign_check.setTitle(_translate("MainWindow", "Авт. проверка подписи", None))
         self.action_CSP.setText(_translate("MainWindow", "КриптоПро CSP", None))
         self.actionOpenSSL.setText(_translate("MainWindow", "OpenSSL", None))
         self.actionDER.setText(_translate("MainWindow", "DER", None))
         self.actionBase64.setText(_translate("MainWindow", "base64", None))
+        self.actionSignCheckOn.setText(_translate("MainWindow", "Включено", None))
+        self.actionSignCheckOff.setText(_translate("MainWindow", "Выключено", None))
 

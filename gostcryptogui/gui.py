@@ -102,6 +102,7 @@ class ChooseCert(QtGui.QDialog):
 class Window(QtGui.QMainWindow):
     provider = str
     encoding = str
+    signcheck = bool
 
     def __init__(self):
         super(Window, self).__init__()
@@ -116,11 +117,16 @@ class Window(QtGui.QMainWindow):
         providerActionGroup = QtGui.QActionGroup(self)
         self.ui.action_CSP.setActionGroup(providerActionGroup)
         self.ui.actionOpenSSL.setActionGroup(providerActionGroup)
+        signcheckActionGroup = QtGui.QActionGroup(self)
+        self.ui.actionSignCheckOn.setActionGroup(signcheckActionGroup)
+        self.ui.actionSignCheckOff.setActionGroup(signcheckActionGroup)
         self.connect(aboutAction, QtCore.SIGNAL('triggered()'), self.aboutProgram)
         self.connect(self.ui.actionDER, QtCore.SIGNAL('triggered()'), self.setOptions)
         self.connect(self.ui.actionBase64, QtCore.SIGNAL('triggered()'), self.setOptions)
         self.connect(self.ui.action_CSP, QtCore.SIGNAL('triggered()'), self.setOptions)
         self.connect(self.ui.actionOpenSSL, QtCore.SIGNAL('triggered()'), self.setOptions)
+        self.connect(self.ui.actionSignCheckOn, QtCore.SIGNAL('triggered()'), self.setOptions)
+        self.connect(self.ui.actionSignCheckOff, QtCore.SIGNAL('triggered()'), self.setOptions)
         self.connect(self.ui.btnSign, QtCore.SIGNAL('clicked()'), self.sign)
         self.connect(self.ui.btnVerify, QtCore.SIGNAL('clicked()'), self.verify)
         self.connect(self.ui.btnEncrypt, QtCore.SIGNAL('clicked()'), self.encrypt)
@@ -132,10 +138,12 @@ class Window(QtGui.QMainWindow):
         config.add_section('gost-crypto-gui')
         config.set('gost-crypto-gui', 'provider', self.provider)
         config.set('gost-crypto-gui', 'encoding', self.encoding)
+        config.set('gost-crypto-gui', 'signcheck', 'True' if self.signcheck else 'False')
         if not os.path.exists(os.path.expanduser('~/.gost-crypto-gui/config.cfg')):
             os.makedirs(os.path.expanduser('~/.gost-crypto-gui/'))
             config.set('gost-crypto-gui', 'provider', 'cprocsp')
             config.set('gost-crypto-gui', 'encoding', 'der')
+            config.set('gost-crypto-gui', 'signcheck', 'True')
         with open(os.path.expanduser('~/.gost-crypto-gui/config.cfg'), 'wb') as configfile:
             config.write(configfile)
 
@@ -145,12 +153,15 @@ class Window(QtGui.QMainWindow):
             config.read(os.path.expanduser('~/.gost-crypto-gui/config.cfg'))
             self.provider = config.get('gost-crypto-gui', 'provider')
             self.encoding = config.get('gost-crypto-gui', 'encoding')
+            self.signcheck = config.getboolean('gost-crypto-gui', 'signcheck')
         except ConfigParser.NoSectionError:
             return
         self.ui.action_CSP.setChecked(self.provider == 'cprocsp')
         self.ui.actionOpenSSL.setChecked(self.provider == 'openssl')
         self.ui.actionBase64.setChecked(self.encoding == 'base64')
         self.ui.actionDER.setChecked(self.encoding == 'der')
+        self.ui.actionSignCheckOn.setChecked(True if self.signcheck else False)
+        self.ui.actionSignCheckOff.setChecked(False if self.signcheck else True)
 
     def setOptions(self):
         if self.ui.actionDER.isChecked():
@@ -159,6 +170,10 @@ class Window(QtGui.QMainWindow):
             self.encoding = 'base64'
         if self.ui.action_CSP.isChecked():
             self.provider = 'cprocsp'
+        if self.ui.actionSignCheckOn.isChecked():
+            self.signcheck = True
+        elif self.ui.actionSignCheckOff.isChecked():
+            self.signcheck = False
         self.writeConfig()
 
     def sign(self, *args):
@@ -281,7 +296,7 @@ class Window(QtGui.QMainWindow):
 
     def aboutProgram(self):
         QtGui.QMessageBox().about(self, u"О программе",
-                                  u"<b>gost-crypto-gui 0.1</b><br>"
+                                  u"<b>gost-crypto-gui 0.2</b><br>"
                                   u"<br>2016г. Борис Макаренко<br>УФССП России по Красноярскому краю"
                                   u"<br>E-mail: <a href='mailto:makarenko@r24.fssprus.ru'>makarenko@r24.fssprus.ru</a>"
                                   u"<br> <a href='mailto:bmakarenko90@gmail.com'>bmakarenko90@gmail.com</a><br><br>"
