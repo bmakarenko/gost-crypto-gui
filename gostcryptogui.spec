@@ -26,10 +26,19 @@ License: MIT
 Group: System Environment/Base
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Prefix: %{_prefix}
-BuildArch: x86_64
 Vendor: Boris Makarenko <bmakarenko90@gmail.com>
 Url: http://github.com/bmakarenko/gost-crypto-gui
-Requires: PyQt4, nautilus-python, lsb-cprocsp-capilite-64, python-setuptools
+
+BuildRequires: python-setuptools
+
+Requires: PyQt4
+Requires: nautilus-python
+Requires: python-setuptools
+%ifarch x86_64 amd64
+Requires: lsb-cprocsp-capilite-64
+%else
+Requires: lsb-cprocsp-capilite
+%endif
 
 %description
 A PyQt GUI for performing cryptographic operations over files using GOST algorithms
@@ -67,9 +76,9 @@ xdg-mime install %{_datadir}/mime/applications/x-extension-sig.xml
 xdg-desktop-menu install --mode system %{_datadir}/applications/gost-crypto-gui.desktop
 xdg-icon-resource install --context mimetypes --mode system --size 256 %{_datadir}/icons/encrypted.png application-x-extension-enc
 xdg-icon-resource install --context mimetypes --mode system --size 256 %{_datadir}/icons/signed.png application-x-extension-sig
-xdg-icon-resource install --size 24 --context emblems %{_datadir}/icons/emblem-nochain.png
-xdg-icon-resource install --size 24 --context emblems %{_datadir}/icons/emblem-unverified.png
-xdg-icon-resource install --size 24 --context emblems %{_datadir}/icons/emblem-verified.png
+xdg-icon-resource install --size 48 --context emblems %{_datadir}/icons/emblem-nochain.png
+xdg-icon-resource install --size 48 --context emblems %{_datadir}/icons/emblem-unverified.png
+xdg-icon-resource install --size 48 --context emblems %{_datadir}/icons/emblem-verified.png
 xdg-icon-resource forceupdate
 
 %clean
@@ -78,8 +87,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
 %{_bindir}/gost-crypto-gui.py
-%{_libdir}/nautilus/extensions-2.0/python/gost-crypto-gui-menu.py
-%{_libdir}/nautilus/extensions-2.0/python/gost-crypto-gui-emblem.py
+%{_libdir}/nautilus/extensions-2.0/python/*.py
 %{_datadir}/pixmaps/gost-crypto-gui.png
 %{_datadir}/applications/gost-crypto-gui.desktop
 %{_datadir}/mime/applications/x-extension-enc.xml
@@ -91,6 +99,18 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/icons/emblem-verified.png
 
 %changelog
+* Wed Nov 17 2016 Sergey Fadin <sergey.fadin@red-soft.ru> - 0.2-1
+-  ///,        ////
+-  \  /,      /  >.
+-   \  /,   _/  /.
+-    \_  /_/   /.
+-     \__/_   <    - Fix Build;
+-     /<<< \_\_    - Update Requires and BuildRequires;
+-    /,)^>>_._ \   - Update %files. Exclude some files.
+-    (/   \\ /\\\
+-        // ````
+- ======((`=======
+
 * Sun Nov 13 2016 Boris Makarenko <bmakarenko90@gmail.com> - 0.2-1
 - Release 0.2
 - Adding emblems on signature files

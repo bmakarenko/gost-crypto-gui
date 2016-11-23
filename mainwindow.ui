@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>gost-crypto-gui.png</normaloff>gost-crypto-gui.png</iconset>
+    <normaloff>../../../../usr/share/pixmaps/gost-crypto-gui.png</normaloff>../../../../usr/share/pixmaps/gost-crypto-gui.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -160,6 +160,9 @@
   <action name="actionSignCheckOff">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>Выключено</string>
