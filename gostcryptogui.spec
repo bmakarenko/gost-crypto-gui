@@ -68,6 +68,8 @@ mkdir -p %{buildroot}/%{_datadir}/mime/applications
 %{__install} -m 0644 %{SOURCE11} %{buildroot}%{_datadir}/icons/emblem-unverified.png
 %{__install} -m 0644 %{SOURCE12} %{buildroot}%{_datadir}/icons/emblem-verified.png
 %{__install} -m 0755 %{SOURCE13} %{buildroot}%{_libdir}/nautilus/extensions-2.0/python/gost-crypto-gui-emblem.py
+python -m py_compile %{buildroot}%{_libdir}/nautilus/extensions-2.0/python/gost-crypto-gui-menu.py
+python -m py_compile %{buildroot}%{_libdir}/nautilus/extensions-2.0/python/gost-crypto-gui-emblem.py
 python %{SOURCE1} install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
 
 %post
@@ -88,6 +90,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %{_bindir}/gost-crypto-gui.py
 %{_libdir}/nautilus/extensions-2.0/python/*.py
+%{_libdir}/nautilus/extensions-2.0/python/*.pyc
 %{_datadir}/pixmaps/gost-crypto-gui.png
 %{_datadir}/applications/gost-crypto-gui.desktop
 %{_datadir}/mime/applications/x-extension-enc.xml
@@ -100,16 +103,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Wed Nov 17 2016 Sergey Fadin <sergey.fadin@red-soft.ru> - 0.2-1
--  ///,        ////
--  \  /,      /  >.
--   \  /,   _/  /.
--    \_  /_/   /.
--     \__/_   <    - Fix Build;
--     /<<< \_\_    - Update Requires and BuildRequires;
--    /,)^>>_._ \   - Update %files. Exclude some files.
--    (/   \\ /\\\
--        // ````
-- ======((`=======
+- Fix Build;
+- Update Requires and BuildRequires;
+- Update %files. Exclude some files.
+
 
 * Sun Nov 13 2016 Boris Makarenko <bmakarenko90@gmail.com> - 0.2-1
 - Release 0.2
