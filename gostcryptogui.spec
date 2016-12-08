@@ -102,7 +102,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/icons/emblem-verified.png
 
 %changelog
-* Wed Nov 17 2016 Sergey Fadin <sergey.fadin@red-soft.ru> - 0.2-1
+* Thu Nov 17 2016 Sergey Fadin <sergey.fadin@red-soft.ru> - 0.2-1
 - Fix Build;
 - Update Requires and BuildRequires;
 - Update %files. Exclude some files.
