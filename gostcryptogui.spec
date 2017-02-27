@@ -2,7 +2,7 @@
 %define version 0.2
 %define unmangled_version 0.2
 %define unmangled_version 0.2
-%define release 1
+%define release 2
 
 Summary: A PyQt GUI for performing cryptographic operations over files using GOST algorithms
 Name: %{name}
@@ -32,7 +32,7 @@ Url: http://github.com/bmakarenko/gost-crypto-gui
 BuildRequires: python-setuptools
 
 Requires: PyQt4
-Requires: nautilus-python
+Requires: python-caja
 Requires: python-setuptools
 %ifarch x86_64 amd64
 Requires: lsb-cprocsp-capilite-64
@@ -51,13 +51,13 @@ python %{SOURCE1} build
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
-mkdir -p %{buildroot}/%{_libdir}/nautilus/extensions-2.0/python
+mkdir -p %{buildroot}/%{_datadir}/caja-python/extensions
 mkdir -p %{buildroot}/%{_datadir}/pixmaps
 mkdir -p %{buildroot}/%{_datadir}/icons
 mkdir -p %{buildroot}/%{_datadir}/applications
 mkdir -p %{buildroot}/%{_datadir}/mime/applications
 %{__install} -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/gost-crypto-gui.py
-%{__install} -m 0755 %{SOURCE3} %{buildroot}%{_libdir}/nautilus/extensions-2.0/python/gost-crypto-gui-menu.py
+%{__install} -m 0755 %{SOURCE3} %{buildroot}%{_datadir}/caja-python/extensions/gost-crypto-gui-menu.py
 %{__install} -m 0644 %{SOURCE4} %{buildroot}%{_datadir}/pixmaps/gost-crypto-gui.png
 %{__install} -m 0644 %{SOURCE5} %{buildroot}%{_datadir}/applications/gost-crypto-gui.desktop
 %{__install} -m 0644 %{SOURCE6} %{buildroot}%{_datadir}/mime/applications/x-extension-enc.xml
@@ -67,9 +67,9 @@ mkdir -p %{buildroot}/%{_datadir}/mime/applications
 %{__install} -m 0644 %{SOURCE10} %{buildroot}%{_datadir}/icons/emblem-nochain.png
 %{__install} -m 0644 %{SOURCE11} %{buildroot}%{_datadir}/icons/emblem-unverified.png
 %{__install} -m 0644 %{SOURCE12} %{buildroot}%{_datadir}/icons/emblem-verified.png
-%{__install} -m 0755 %{SOURCE13} %{buildroot}%{_libdir}/nautilus/extensions-2.0/python/gost-crypto-gui-emblem.py
-python -m py_compile %{buildroot}%{_libdir}/nautilus/extensions-2.0/python/gost-crypto-gui-menu.py
-python -m py_compile %{buildroot}%{_libdir}/nautilus/extensions-2.0/python/gost-crypto-gui-emblem.py
+%{__install} -m 0755 %{SOURCE13} %{buildroot}%{_datadir}/caja-python/extensions/gost-crypto-gui-emblem.py
+python -m py_compile %{buildroot}%{_datadir}/caja-python/extensions/gost-crypto-gui-menu.py
+python -m py_compile %{buildroot}%{_datadir}/caja-python/extensions/gost-crypto-gui-emblem.py
 python %{SOURCE1} install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
 
 %post
@@ -89,8 +89,9 @@ rm -rf $RPM_BUILD_ROOT
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
 %{_bindir}/gost-crypto-gui.py
-%{_libdir}/nautilus/extensions-2.0/python/*.py
-%{_libdir}/nautilus/extensions-2.0/python/*.pyc
+%{_datadir}/caja-python/extensions/*.py
+%{_datadir}/caja-python/extensions/*.pyc
+%{_datadir}/caja-python/extensions/*.pyo
 %{_datadir}/pixmaps/gost-crypto-gui.png
 %{_datadir}/applications/gost-crypto-gui.desktop
 %{_datadir}/mime/applications/x-extension-enc.xml
@@ -102,6 +103,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/icons/emblem-verified.png
 
 %changelog
+* Mon Feb 27 2017 Boris Makarenko <bmakarenko90@gmail.com> - 0.2-2
+- Rebuild for EL7 and Caja
+
 * Thu Nov 17 2016 Sergey Fadin <sergey.fadin@red-soft.ru> - 0.2-1
 - Fix Build;
 - Update Requires and BuildRequires;
