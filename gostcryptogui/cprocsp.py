@@ -154,6 +154,8 @@ class CryptoPro:
     # Метод sign выполняет операцию подписи заданного файла(filepath), при помощи заданного SHA-отпечатка
     # сертификата(thumbprint) и используя заданную кодировку(encoding): DER или BASE64
     # Путь до файла должен быть абсолютным. Подписанный файл сохраняется в той же директории с расширением '.sig'
+    # TODO Сделать возможность формирования отсоединенной подписи
+    # TODO Сделать возможность добавления подписи
     def sign(self, thumbprint, filepath, encoding):
         # Исправляем криптопрошные крокозябры
         new_env = dict(os.environ)
@@ -167,6 +169,8 @@ class CryptoPro:
             cryptcp = subprocess.Popen(['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-sign', '-thumbprint', thumbprint,
                                         '-errchain', filepath],
                                        cwd=os.path.dirname(filepath), stdout=subprocess.PIPE, env=new_env)
+        # Согласиться
+        cryptcp.stdin.write('Y')
         output = cryptcp.stdout.read()
         errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
                               re.MULTILINE + re.DOTALL).groupdict()['errorcode']
@@ -179,6 +183,8 @@ class CryptoPro:
     # Если требуется при этом отсоединить подпись от файла, указываем параметр dettach=True
     # Возвращает кортеж, состоящий из словаря сертификата и булева значения
     # указывающего была ли проверена цепочка сертификатов или нет. True - была, False - нет
+    # TODO Сделать возможность проверки отсоединенной подписи
+    # TODO Сделать возможность проверки нескольких подписей в одном файле
     def verify(self, filepath, dettach=False):
         # Если это не файл подписи, проверяем лежащий рядом файл с расширением '.sig'
         if not filepath[-4:] == '.sig':
@@ -212,8 +218,8 @@ class CryptoPro:
         else:
             return m.groupdict(), chainisverified, chainisrevoked, certisexpired
 
-    # Метод encrypt шифрует заданный файл(filepath), при помощи SHA-отпечатка сертификата(thumbprint),
-    # и используя заданную кодировку(encoding): DER или BASE64
+    # Метод encrypt шифрует заданный файл(filepath), при помощи SHA-отпечатка сертификата
+    #  или имени файла сертификата (thumbprint), и используя заданную кодировку(encoding): DER или BASE64
     # Путь до файла должен быть абсолютным. Зашифрованный файл сохраняется в той же директории с расширением '.enc'
     def encrypt(self, thumbprint, filepath, encoding):
         # Исправляем криптопрошные крокозябры
@@ -222,11 +228,11 @@ class CryptoPro:
 
         if encoding == 'der':
             cryptcp = subprocess.Popen(['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-encr', '-der',
-                                        '-thumbprint', thumbprint, filepath, filepath + '.enc'],
+                                         '-f' if thumbprint[0] == '/' else '-thumbprint', thumbprint, filepath, filepath + '.enc'],
                                        stdout=subprocess.PIPE, stdin=subprocess.PIPE, env=new_env, shell=False)
         else:
             cryptcp = subprocess.Popen(
-                ['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-encr', '-thumbprint', thumbprint, filepath,
+                ['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-encr', '-f' if thumbprint[0] == '/' else '-thumbprint', thumbprint, filepath,
                  filepath + '.enc'],
                 stdout=subprocess.PIPE, stdin=subprocess.PIPE, env=new_env, shell=False)
         # Согласит
