@@ -70,6 +70,8 @@ class ChooseCert(QtGui.QDialog):
         model = QtGui.QStringListModel()
         cert_list = QtCore.QStringList()
         certs_data = CryptoPro().get_store_certs('uMy')
+        if not withsecret:
+            cert_list.append(u'Из файла...')
         for line in certs_data:
             if withsecret and line['secretKey'] == 'Yes':
                     cert_list.append(
@@ -92,7 +94,10 @@ class ChooseCert(QtGui.QDialog):
         self.show()
 
     def select_cert(self, index):
-        self.cert = self.certs_hashes[index.row()]['thumbprint']
+        if index.row() == 0:
+            self.cert = 'file'
+        else:
+            self.cert = self.certs_hashes[index.row()-1]['thumbprint']
         self.ui.okButton.setEnabled(bool(self.cert))
 
     def getCertificate(self):
@@ -250,11 +255,15 @@ class Window(QtGui.QMainWindow):
         choose = ChooseCert(False)
         if choose.exec_():
             thumbprint = choose.getCertificate()
+            if thumbprint == 'file':
+                thumbprint = QtGui.QFileDialog().getOpenFileName(self, u"Выберите файл(ы)", "", "*.crt *cer")
+                if not thumbprint:
+                    return
         else:
             return
         for filename in file_names:
             try:
-                encrypted, chain, revoked, expired = CryptoPro().encrypt(thumbprint, unicode(filename), self.encoding)
+                encrypted, chain, revoked, expired = CryptoPro().encrypt(unicode(thumbprint), unicode(filename), self.encoding)
                 if encrypted:
                     message = u'Файл %s успешно зашифрован.\n' % unicode(filename)
                     if not chain:
@@ -297,7 +306,7 @@ class Window(QtGui.QMainWindow):
     def aboutProgram(self):
         QtGui.QMessageBox().about(self, u"О программе",
                                   u"<b>gost-crypto-gui 0.2</b><br>"
-                                  u"<br>2016г. Борис Макаренко<br>УФССП России по Красноярскому краю"
-                                  u"<br>E-mail: <a href='mailto:makarenko@r24.fssprus.ru'>makarenko@r24.fssprus.ru</a>"
+                                  u"<br>2017г. Борис Макаренко<br>УИТ ФССП России"
+                                  u"<br>E-mail: <a href='mailto:makarenko@fssprus.ru'>makarenko@fssprus.ru</a>"
                                   u"<br> <a href='mailto:bmakarenko90@gmail.com'>bmakarenko90@gmail.com</a><br><br>"
                                   u"<a href='http://opensource.org/licenses/MIT'>Лицензия MIT</a>")
