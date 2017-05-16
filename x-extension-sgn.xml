@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+ <mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
+   <mime-type type="application/x-extension-sgn">
+   <comment>Dettached PKCS #7 signature</comment>
+   <comment xml:lang="ru">Отсоединенная подпись PKCS #7</comment>
+   <glob pattern="*.sgn"/>
+  </mime-type>
+ </mime-info>

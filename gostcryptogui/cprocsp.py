@@ -154,21 +154,21 @@ class CryptoPro:
     # Метод sign выполняет операцию подписи заданного файла(filepath), при помощи заданного SHA-отпечатка
     # сертификата(thumbprint) и используя заданную кодировку(encoding): DER или BASE64
     # Путь до файла должен быть абсолютным. Подписанный файл сохраняется в той же директории с расширением '.sig'
-    # TODO Сделать возможность формирования отсоединенной подписи
+    # Возвращает кортеж с результатом выполнения (True) и предупреждением(если имеется)
     # TODO Сделать возможность добавления подписи
-    def sign(self, thumbprint, filepath, encoding):
+    def sign(self, thumbprint, filepath, encoding, dettached=False):
         # Исправляем криптопрошные крокозябры
         new_env = dict(os.environ)
         new_env['LANG'] = 'en_US.UTF-8'
 
         if encoding == 'der':
-            cryptcp = subprocess.Popen(['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-sign', '-thumbprint', thumbprint,
-                                        '-errchain', '-der', filepath],
-                                       cwd=os.path.dirname(filepath), stdout=subprocess.PIPE, env=new_env)
+            cryptcp = subprocess.Popen(['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-signf' if dettached else '-sign',
+                                        '-thumbprint', thumbprint, '-der', filepath],
+                                       cwd=os.path.dirname(filepath), stdout=subprocess.PIPE, stdin=subprocess.PIPE, env=new_env)
         else:
-            cryptcp = subprocess.Popen(['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-sign', '-thumbprint', thumbprint,
-                                        '-errchain', filepath],
-                                       cwd=os.path.dirname(filepath), stdout=subprocess.PIPE, env=new_env)
+            cryptcp = subprocess.Popen(['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-signf' if dettached else '-sign',
+                                        '-thumbprint', thumbprint, filepath],
+                                       cwd=os.path.dirname(filepath), stdout=subprocess.PIPE, stdin=subprocess.PIPE, env=new_env)
         # Согласиться
         cryptcp.stdin.write('Y')
         output = cryptcp.stdout.read()
@@ -176,8 +176,11 @@ class CryptoPro:
                               re.MULTILINE + re.DOTALL).groupdict()['errorcode']
         if not errorcode == '0':
             raise Exception(self.error_description(errorcode))
+        # Проверяем наличие в выводе сообщения об ошибке проверки цепочки сертификатов
+        elif 'Certificate chain is not checked for this certificate' in output:
+            return True, self.error_description('0x20000133')
         else:
-            return True
+            return True, None
 
     # Метод verify проверяет подпись файла(filepath).
     # Если требуется при этом отсоединить подпись от файла, указываем параметр dettach=True

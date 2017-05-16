@@ -22,6 +22,7 @@ Source10: emblem-nochain.png
 Source11: emblem-unverified.png
 Source12: emblem-verified.png
 Source13: gost-crypto-gui-emblem.py
+Source14: x-extension-sgn.xml
 License: MIT
 Group: System Environment/Base
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
@@ -62,6 +63,7 @@ mkdir -p %{buildroot}/%{_datadir}/mime/applications
 %{__install} -m 0644 %{SOURCE5} %{buildroot}%{_datadir}/applications/gost-crypto-gui.desktop
 %{__install} -m 0644 %{SOURCE6} %{buildroot}%{_datadir}/mime/applications/x-extension-enc.xml
 %{__install} -m 0644 %{SOURCE7} %{buildroot}%{_datadir}/mime/applications/x-extension-sig.xml
+%{__install} -m 0644 %{SOURCE14} %{buildroot}%{_datadir}/mime/applications/x-extension-sgn.xml
 %{__install} -m 0644 %{SOURCE8} %{buildroot}%{_datadir}/icons/encrypted.png
 %{__install} -m 0644 %{SOURCE9} %{buildroot}%{_datadir}/icons/signed.png
 %{__install} -m 0644 %{SOURCE10} %{buildroot}%{_datadir}/icons/emblem-nochain.png
@@ -75,9 +77,11 @@ python %{SOURCE1} install --single-version-externally-managed -O1 --root=$RPM_BU
 %post
 xdg-mime install %{_datadir}/mime/applications/x-extension-enc.xml
 xdg-mime install %{_datadir}/mime/applications/x-extension-sig.xml
+xdg-mime install %{_datadir}/mime/applications/x-extension-sgn.xml
 xdg-desktop-menu install --mode system %{_datadir}/applications/gost-crypto-gui.desktop
 xdg-icon-resource install --context mimetypes --mode system --size 256 %{_datadir}/icons/encrypted.png application-x-extension-enc
 xdg-icon-resource install --context mimetypes --mode system --size 256 %{_datadir}/icons/signed.png application-x-extension-sig
+xdg-icon-resource install --context mimetypes --mode system --size 256 %{_datadir}/icons/signed.png application-x-extension-sgn
 xdg-icon-resource install --size 48 --context emblems %{_datadir}/icons/emblem-nochain.png
 xdg-icon-resource install --size 48 --context emblems %{_datadir}/icons/emblem-unverified.png
 xdg-icon-resource install --size 48 --context emblems %{_datadir}/icons/emblem-verified.png
@@ -95,6 +99,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/gost-crypto-gui.desktop
 %{_datadir}/mime/applications/x-extension-enc.xml
 %{_datadir}/mime/applications/x-extension-sig.xml
+%{_datadir}/mime/applications/x-extension-sgn.xml
 %{_datadir}/icons/encrypted.png
 %{_datadir}/icons/signed.png
 %{_datadir}/icons/emblem-nochain.png
@@ -102,6 +107,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/icons/emblem-verified.png
 
 %changelog
+* Tue May 16 2017 Boris Makarenko <bmakarenko90@gmail.com> - 0.2-1
+- Register *.sgn mime-type
+
 * Thu Nov 17 2016 Sergey Fadin <sergey.fadin@red-soft.ru> - 0.2-1
 - Fix Build;
 - Update Requires and BuildRequires;

@@ -4,12 +4,13 @@
 Encoding=UTF-8
 Name=gost-crypto-gui
 Name[ru]=Подпись и шифрование файлов
+Comment=GUI for performing cryptographic operations over files using GOST algorithms
 Comment[ru]=Графический интерфейс пользователя для подписи и шифрования файлов при помощи алгоритмов ГОСТ
 Exec=/usr/bin/gost-crypto-gui.py
 Terminal=false
 Type=Application
 Icon=gost-crypto-gui
 StartupNotify=true
-MimeType=application/x-extension-enc;application/x-extension-sig;
+MimeType=application/x-extension-enc;application/x-extension-sig;application/x-extension-sgn;
 X-Desktop-File-Install-Version=0.15
 Categories=Qt;HardwareSettings;Settings;System;
