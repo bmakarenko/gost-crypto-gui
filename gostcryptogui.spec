@@ -29,17 +29,12 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Prefix: %{_prefix}
 Vendor: Boris Makarenko <bmakarenko90@gmail.com>
 Url: http://github.com/bmakarenko/gost-crypto-gui
-
+BuildArch: noarch
 BuildRequires: python-setuptools
 
 Requires: PyQt4
 Requires: nautilus-python
 Requires: python-setuptools
-%ifarch x86_64 amd64
-Requires: lsb-cprocsp-capilite-64
-%else
-Requires: lsb-cprocsp-capilite
-%endif
 
 %description
 A PyQt GUI for performing cryptographic operations over files using GOST algorithms

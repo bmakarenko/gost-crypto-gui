@@ -151,6 +151,11 @@ class Window(QtGui.QMainWindow):
         self.connect(self.ui.btnEncrypt, QtCore.SIGNAL('clicked()'), self.encrypt)
         self.connect(self.ui.btnDecrypt, QtCore.SIGNAL('clicked()'), self.decrypt)
         self.readConfig()
+        try:
+            CryptoPro()
+        except Exception as error:
+            QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+
 
     def writeConfig(self):
         config = ConfigParser.RawConfigParser()
@@ -211,7 +216,11 @@ class Window(QtGui.QMainWindow):
                 return
         else:
             file_names = args
-        choose = ChooseCert(True)
+        try:
+            choose = ChooseCert(True)
+        except Exception as error:
+            QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+            return
         if choose.exec_():
             thumbprint = choose.getCertificate()
         else:
@@ -278,7 +287,11 @@ class Window(QtGui.QMainWindow):
                 return
         else:
             file_names = args
-        choose = ChooseCert(False)
+        try:
+            choose = ChooseCert(False)
+        except Exception as error:
+            QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+            return
         if choose.exec_():
             thumbprint = choose.getCertificate()
             if thumbprint == 'file':
@@ -309,7 +322,11 @@ class Window(QtGui.QMainWindow):
                 return
         else:
             file_names = args
-        choose = ChooseCert(True)
+        try:
+            choose = ChooseCert(True)
+        except Exception as error:
+            QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+            return
         if choose.exec_():
             thumbprint = choose.getCertificate()
         else:

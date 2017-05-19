@@ -61,7 +61,9 @@ class CryptoPro:
         elif platform.machine() == 'i686':
             self.arch = 'ia32'
         else:
-            pass
+            raise Exception(u'Невозможно определить текущую архитектуру.')
+        if not os.path.exists('/opt/cprocsp/bin/%s/certmgr' % self.arch) or not os.path.exists('/opt/cprocsp/bin/%s/cryptcp' % self.arch):
+            raise Exception(u'СКЗИ Крипто Про CSP или некоторые его компоненты не установлены.')
 
     # Метод error_description принимает код ошибки и возвращает её описание. Если такой ошибки в словаре нет,
     # то код ошибки возвращается обратно
