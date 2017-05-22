@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2016 Борис Макаренко
+Copyright (c) 2017 Борис Макаренко
 
 Данная лицензия разрешает лицам, получившим копию данного программного
 обеспечения и сопутствующей документации (в дальнейшем именуемыми «Программное
@@ -23,7 +23,7 @@ Copyright (c) 2016 Борис Макаренко
 ЧИСЛЕ, ПРИ ДЕЙСТВИИ КОНТРАКТА, ДЕЛИКТЕ ИЛИ ИНОЙ СИТУАЦИИ, ВОЗНИКШИМ ИЗ-ЗА
 ИСПОЛЬЗОВАНИЯ ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ ИЛИ ИНЫХ ДЕЙСТВИЙ С ПРОГРАММНЫМ ОБЕСПЕЧЕНИЕМ..
 
-Copyright (c) 2016 Boris Makarenko
+Copyright (c) 2017 Boris Makarenko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -79,7 +79,7 @@ class ChooseCert(QtGui.QDialog):
                             line['subjectCN'], line['issuerCN'], line['thumbprint'], line['notValidBefore'],
                             line['notValidAfter']))
                     self.certs_hashes.append(line)
-            elif not withsecret:
+            else:
                 cert_list.append(
                     u'%s, \nВыдан:%s, \nХэш SHA1: %s\nНе действителен до: %s\nНе действителен после: %s' % (
                         line['subjectCN'], line['issuerCN'], line['thumbprint'], line['notValidBefore'],
@@ -90,7 +90,10 @@ class ChooseCert(QtGui.QDialog):
         self.ui.cancelButton.clicked.connect(self.close)
         self.ui.okButton.setEnabled(False)
         self.ui.okButton.clicked.connect(self.accept)
-        self.ui.listView.clicked.connect(self.select_cert)
+        if withsecret:
+            self.ui.listView.clicked.connect(self.select_cert_w_secret)
+        else:
+            self.ui.listView.clicked.connect(self.select_cert)
         self.show()
 
     def select_cert(self, index):
@@ -98,6 +101,11 @@ class ChooseCert(QtGui.QDialog):
             self.cert = 'file'
         else:
             self.cert = self.certs_hashes[index.row()-1]['thumbprint']
+        self.ui.okButton.setEnabled(bool(self.cert))
+        print self.cert
+
+    def select_cert_w_secret(self, index):
+        self.cert = self.certs_hashes[index.row()]['thumbprint']
         self.ui.okButton.setEnabled(bool(self.cert))
 
     def getCertificate(self):
@@ -108,6 +116,7 @@ class Window(QtGui.QMainWindow):
     provider = str
     encoding = str
     signcheck = bool
+    dettached = bool
 
     def __init__(self):
         super(Window, self).__init__()
@@ -125,6 +134,9 @@ class Window(QtGui.QMainWindow):
         signcheckActionGroup = QtGui.QActionGroup(self)
         self.ui.actionSignCheckOn.setActionGroup(signcheckActionGroup)
         self.ui.actionSignCheckOff.setActionGroup(signcheckActionGroup)
+        dettachedActionGroup = QtGui.QActionGroup(self)
+        self.ui.actionDettachedOn.setActionGroup(dettachedActionGroup)
+        self.ui.actionDettachedOff.setActionGroup(dettachedActionGroup)
         self.connect(aboutAction, QtCore.SIGNAL('triggered()'), self.aboutProgram)
         self.connect(self.ui.actionDER, QtCore.SIGNAL('triggered()'), self.setOptions)
         self.connect(self.ui.actionBase64, QtCore.SIGNAL('triggered()'), self.setOptions)
@@ -132,11 +144,18 @@ class Window(QtGui.QMainWindow):
         self.connect(self.ui.actionOpenSSL, QtCore.SIGNAL('triggered()'), self.setOptions)
         self.connect(self.ui.actionSignCheckOn, QtCore.SIGNAL('triggered()'), self.setOptions)
         self.connect(self.ui.actionSignCheckOff, QtCore.SIGNAL('triggered()'), self.setOptions)
+        self.connect(self.ui.actionDettachedOn, QtCore.SIGNAL('triggered()'), self.setOptions)
+        self.connect(self.ui.actionDettachedOff, QtCore.SIGNAL('triggered()'), self.setOptions)
         self.connect(self.ui.btnSign, QtCore.SIGNAL('clicked()'), self.sign)
         self.connect(self.ui.btnVerify, QtCore.SIGNAL('clicked()'), self.verify)
         self.connect(self.ui.btnEncrypt, QtCore.SIGNAL('clicked()'), self.encrypt)
         self.connect(self.ui.btnDecrypt, QtCore.SIGNAL('clicked()'), self.decrypt)
         self.readConfig()
+        try:
+            CryptoPro()
+        except Exception as error:
+            QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+
 
     def writeConfig(self):
         config = ConfigParser.RawConfigParser()
@@ -144,11 +163,13 @@ class Window(QtGui.QMainWindow):
         config.set('gost-crypto-gui', 'provider', self.provider)
         config.set('gost-crypto-gui', 'encoding', self.encoding)
         config.set('gost-crypto-gui', 'signcheck', 'True' if self.signcheck else 'False')
+        config.set('gost-crypto-gui', 'dettached', 'True' if self.dettached else 'False')
         if not os.path.exists(os.path.expanduser('~/.gost-crypto-gui/config.cfg')):
             os.makedirs(os.path.expanduser('~/.gost-crypto-gui/'))
             config.set('gost-crypto-gui', 'provider', 'cprocsp')
             config.set('gost-crypto-gui', 'encoding', 'der')
             config.set('gost-crypto-gui', 'signcheck', 'True')
+            config.set('gost-crypto-gui', 'dettached', 'False')
         with open(os.path.expanduser('~/.gost-crypto-gui/config.cfg'), 'wb') as configfile:
             config.write(configfile)
 
@@ -159,6 +180,7 @@ class Window(QtGui.QMainWindow):
             self.provider = config.get('gost-crypto-gui', 'provider')
             self.encoding = config.get('gost-crypto-gui', 'encoding')
             self.signcheck = config.getboolean('gost-crypto-gui', 'signcheck')
+            self.dettached = config.getboolean('gost-crypto-gui', 'dettached')
         except ConfigParser.NoSectionError:
             return
         self.ui.action_CSP.setChecked(self.provider == 'cprocsp')
@@ -167,6 +189,8 @@ class Window(QtGui.QMainWindow):
         self.ui.actionDER.setChecked(self.encoding == 'der')
         self.ui.actionSignCheckOn.setChecked(True if self.signcheck else False)
         self.ui.actionSignCheckOff.setChecked(False if self.signcheck else True)
+        self.ui.actionDettachedOn.setChecked(True if self.dettached else False)
+        self.ui.actionDettachedOff.setChecked(False if self.dettached else True)
 
     def setOptions(self):
         if self.ui.actionDER.isChecked():
@@ -179,6 +203,10 @@ class Window(QtGui.QMainWindow):
             self.signcheck = True
         elif self.ui.actionSignCheckOff.isChecked():
             self.signcheck = False
+        if self.ui.actionDettachedOn.isChecked():
+            self.dettached = True
+        elif self.ui.actionDettachedOff.isChecked():
+            self.dettached = False
         self.writeConfig()
 
     def sign(self, *args):
@@ -188,18 +216,33 @@ class Window(QtGui.QMainWindow):
                 return
         else:
             file_names = args
-        choose = ChooseCert(True)
+        try:
+            choose = ChooseCert(True)
+        except Exception as error:
+            QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+            return
         if choose.exec_():
             thumbprint = choose.getCertificate()
         else:
             return
-        for filename in file_names:
+        progressDialog = QtGui.QProgressDialog("", u"Отмена", 0, 0, self)
+        progressDialog.setValue(-1)
+        progressDialog.show()
+        for index, filename in enumerate(file_names, start=1):
+            progressDialog.setLabelText(u'Подпись файла %s из %s<br>Текущий файл: %s' % (index, len(file_names),
+                                                                                         filename.split('/')[-1]))
+            if progressDialog.wasCanceled():
+                return
             try:
-                if CryptoPro().sign(thumbprint, unicode(filename), self.encoding):
+                result = CryptoPro().sign(thumbprint, unicode(filename), self.encoding, self.dettached)
+                if result[0]:
                     QtGui.QMessageBox().information(self, u"Cообщение",
-                                                    u"Файл %s успешно подписан" % unicode(filename))
+                                                    u"Файл %s успешно подписан.<br>" % unicode(filename))
+                if result[1]:
+                    QtGui.QMessageBox().warning(self, u"Предупреждение", result[1])
             except Exception as error:
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+        progressDialog.close()
 
     def verify(self, dettach=False, *args):
         if self.sender():
@@ -208,7 +251,14 @@ class Window(QtGui.QMainWindow):
                 return
         else:
             file_names = args
-        for filename in file_names:
+        progressDialog = QtGui.QProgressDialog("", u"Отмена", 0, 0, self)
+        progressDialog.setValue(-1)
+        progressDialog.show()
+        for index, filename in enumerate(file_names, start=1):
+            progressDialog.setLabelText(u'Проверка подписи файла %s из %s<br>Текущий файл: %s' % (index, len(file_names),
+                                                                                         filename.split('/')[-1]))
+            if progressDialog.wasCanceled():
+                return
             try:
                 signer, chain, revoked, expired = CryptoPro().verify(unicode(filename), dettach)
                 cert_view = ViewCert()
@@ -244,6 +294,8 @@ class Window(QtGui.QMainWindow):
                 cert_view.exec_()
             except Exception as error:
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+        progressDialog.close()
+
 
     def encrypt(self, *args):
         if self.sender():
@@ -252,7 +304,11 @@ class Window(QtGui.QMainWindow):
                 return
         else:
             file_names = args
-        choose = ChooseCert(False)
+        try:
+            choose = ChooseCert(False)
+        except Exception as error:
+            QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+            return
         if choose.exec_():
             thumbprint = choose.getCertificate()
             if thumbprint == 'file':
@@ -261,7 +317,14 @@ class Window(QtGui.QMainWindow):
                     return
         else:
             return
-        for filename in file_names:
+        progressDialog = QtGui.QProgressDialog("", u"Отмена", 0, 0, self)
+        progressDialog.setValue(-1)
+        progressDialog.show()
+        for index, filename in enumerate(file_names, start=1):
+            progressDialog.setLabelText(u'Шифрование файла %s из %s<br>Текущий файл: %s' % (index, len(file_names),
+                                                                                         filename.split('/')[-1]))
+            if progressDialog.wasCanceled():
+                return
             try:
                 encrypted, chain, revoked, expired = CryptoPro().encrypt(unicode(thumbprint), unicode(filename), self.encoding)
                 if encrypted:
@@ -275,20 +338,32 @@ class Window(QtGui.QMainWindow):
                     QtGui.QMessageBox().information(self, u"Cообщение", message)
             except Exception as error:
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+        progressDialog.close()
 
     def decrypt(self, *args):
         if self.sender():
-            file_names = QtGui.QFileDialog().getOpenFileNames(self, u"Выберите файл(ы)", "", "*.enc")
+            file_names = QtGui.QFileDialog().getOpenFileNames(self, u"Выберите файл(ы)", "", "*.enc *.encr")
             if not file_names:
                 return
         else:
             file_names = args
-        choose = ChooseCert(True)
+        try:
+            choose = ChooseCert(True)
+        except Exception as error:
+            QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+            return
         if choose.exec_():
             thumbprint = choose.getCertificate()
         else:
             return
-        for filename in file_names:
+        progressDialog = QtGui.QProgressDialog("", u"Отмена", 0, 0, self)
+        progressDialog.setValue(-1)
+        progressDialog.show()
+        for index, filename in enumerate(file_names, start=1):
+            progressDialog.setLabelText(u'Расшифровка файла %s из %s<br>Текущий файл: %s' % (index, len(file_names),
+                                                                                         filename.split('/')[-1]))
+            if progressDialog.wasCanceled():
+                return
             try:
                 decrypted, chain, revoked, expired = CryptoPro().decrypt(thumbprint, unicode(filename))
                 if decrypted:
@@ -302,10 +377,12 @@ class Window(QtGui.QMainWindow):
                     QtGui.QMessageBox().information(self, u"Cообщение", message)
             except Exception as error:
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+        progressDialog.close()
+
 
     def aboutProgram(self):
         QtGui.QMessageBox().about(self, u"О программе",
-                                  u"<b>gost-crypto-gui 0.2</b><br>"
+                                  u"<b>gost-crypto-gui 0.3a</b><br>"
                                   u"<br>2017г. Борис Макаренко<br>УИТ ФССП России"
                                   u"<br>E-mail: <a href='mailto:makarenko@fssprus.ru'>makarenko@fssprus.ru</a>"
                                   u"<br> <a href='mailto:bmakarenko90@gmail.com'>bmakarenko90@gmail.com</a><br><br>"

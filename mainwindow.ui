@@ -67,7 +67,7 @@
      <x>0</x>
      <y>0</y>
      <width>265</width>
-     <height>24</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -98,9 +98,17 @@
      <addaction name="actionSignCheckOn"/>
      <addaction name="actionSignCheckOff"/>
     </widget>
+    <widget class="QMenu" name="dettached">
+     <property name="title">
+      <string>Отсоединенная подпись</string>
+     </property>
+     <addaction name="actionDettachedOn"/>
+     <addaction name="actionDettachedOff"/>
+    </widget>
     <addaction name="cryptoprovider"/>
     <addaction name="encoding"/>
     <addaction name="sign_check"/>
+    <addaction name="dettached"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -163,6 +171,25 @@
    </property>
    <property name="checked">
     <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Выключено</string>
+   </property>
+  </action>
+  <action name="actionDettachedOn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Включено</string>
+   </property>
+  </action>
+  <action name="actionDettachedOff">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Выключено</string>
