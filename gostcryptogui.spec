@@ -11,7 +11,6 @@ Release: %{release}
 Source0: gostcryptogui.tar.gz
 Source1: setup.py
 Source2: gost-crypto-gui.py
-Source3: gost-crypto-gui-menu.py
 Source4: gost-crypto-gui.png
 Source5: gost-crypto-gui.desktop
 Source6: x-extension-enc.xml
@@ -21,7 +20,6 @@ Source9: signed.png
 Source10: emblem-nochain.png
 Source11: emblem-unverified.png
 Source12: emblem-verified.png
-Source13: gost-crypto-gui-emblem.py
 Source14: x-extension-sgn.xml
 License: MIT
 Group: System Environment/Base
@@ -33,7 +31,6 @@ BuildArch: noarch
 BuildRequires: python-setuptools
 
 Requires: PyQt4
-Requires: nautilus-python
 Requires: python-setuptools
 
 %description
@@ -53,7 +50,6 @@ mkdir -p %{buildroot}/%{_datadir}/icons
 mkdir -p %{buildroot}/%{_datadir}/applications
 mkdir -p %{buildroot}/%{_datadir}/mime/applications
 %{__install} -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/gost-crypto-gui.py
-%{__install} -m 0755 %{SOURCE3} %{buildroot}%{_libdir}/nautilus/extensions-2.0/python/gost-crypto-gui-menu.py
 %{__install} -m 0644 %{SOURCE4} %{buildroot}%{_datadir}/pixmaps/gost-crypto-gui.png
 %{__install} -m 0644 %{SOURCE5} %{buildroot}%{_datadir}/applications/gost-crypto-gui.desktop
 %{__install} -m 0644 %{SOURCE6} %{buildroot}%{_datadir}/mime/applications/x-extension-enc.xml
@@ -64,9 +60,6 @@ mkdir -p %{buildroot}/%{_datadir}/mime/applications
 %{__install} -m 0644 %{SOURCE10} %{buildroot}%{_datadir}/icons/emblem-nochain.png
 %{__install} -m 0644 %{SOURCE11} %{buildroot}%{_datadir}/icons/emblem-unverified.png
 %{__install} -m 0644 %{SOURCE12} %{buildroot}%{_datadir}/icons/emblem-verified.png
-%{__install} -m 0755 %{SOURCE13} %{buildroot}%{_libdir}/nautilus/extensions-2.0/python/gost-crypto-gui-emblem.py
-python -m py_compile %{buildroot}%{_libdir}/nautilus/extensions-2.0/python/gost-crypto-gui-menu.py
-python -m py_compile %{buildroot}%{_libdir}/nautilus/extensions-2.0/python/gost-crypto-gui-emblem.py
 python %{SOURCE1} install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
 
 %post
@@ -88,8 +81,6 @@ rm -rf $RPM_BUILD_ROOT
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
 %{_bindir}/gost-crypto-gui.py
-%{_libdir}/nautilus/extensions-2.0/python/*.py
-%{_libdir}/nautilus/extensions-2.0/python/*.pyc
 %{_datadir}/pixmaps/gost-crypto-gui.png
 %{_datadir}/applications/gost-crypto-gui.desktop
 %{_datadir}/mime/applications/x-extension-enc.xml
@@ -102,8 +93,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/icons/emblem-verified.png
 
 %changelog
-* Tue May 16 2017 Boris Makarenko <bmakarenko90@gmail.com> - 0.2-1
+* Mon May 22 2017 Boris Makarenko <bmakarenko90@gmail.com> - 0.2-1
 - Register *.sgn mime-type
+- Excluded nautilus plugins to separate package
 
 * Thu Nov 17 2016 Sergey Fadin <sergey.fadin@red-soft.ru> - 0.2-1
 - Fix Build;
