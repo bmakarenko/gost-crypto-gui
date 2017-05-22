@@ -43,18 +43,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
-import nautilus
+from gi.repository import Caja, GObject
 import urllib
 import subprocess
 import logging
 import os
 
 
-class VerifyMenuProvider(nautilus.MenuProvider):
-    # Nautilus crashes if a plugin doesn't implement the __init__ method.
-    # See Bug #374958
+class VerifyMenuProvider(GObject.GObject, Caja.MenuProvider):
+
     def __init__(self):
-        logging.basicConfig(filename='/tmp/verify-nautilus-debug', level=logging.DEBUG)
+        pass
 
     def get_file_items(self, window, files):
         if len(files) != 1:
@@ -69,9 +68,9 @@ class VerifyMenuProvider(nautilus.MenuProvider):
         if filename[-3:] != 'sig':
             return
 
-        itemVerify = nautilus.MenuItem('VerifyMenuProvider::Verify',
-                                       'Проверить ЭЦП',
-                                       'Проверить ЭЦП %s' % filename)
+        itemVerify = Caja.MenuItem(name='VerifyMenuProvider::Verify',
+                                       label='Проверить ЭЦП',
+                                       tip='Проверить ЭЦП %s' % filename)
 
         itemVerify.connect("activate", self.menu_activate_cb, fileObj)
         return itemVerify,
@@ -81,11 +80,10 @@ class VerifyMenuProvider(nautilus.MenuProvider):
         subprocess.Popen(['python', '/usr/bin/gost-crypto-gui.py', '-verify', filename])
 
 
-class DettachMenuProvider(nautilus.MenuProvider):
-    # Nautilus crashes if a plugin doesn't implement the __init__ method.
-    # See Bug #374958
+class DettachMenuProvider(GObject.GObject, Caja.MenuProvider):
+
     def __init__(self):
-        logging.basicConfig(filename='/tmp/dettach-nautilus-debug', level=logging.DEBUG)
+        pass
 
     def get_file_items(self, window, files):
         if len(files) != 1:
@@ -100,9 +98,9 @@ class DettachMenuProvider(nautilus.MenuProvider):
         if filename[-3:] != 'sig':
             return
 
-        itemVerify = nautilus.MenuItem('DettachMenuProvider::Dettach',
-                                       'Отсоединить подпись',
-                                       'Отсоединить подпись %s' % filename)
+        itemVerify = Caja.MenuItem(name='DettachMenuProvider::Dettach',
+                                       label='Отсоединить подпись',
+                                       tip='Отсоединить подпись %s' % filename)
 
         itemVerify.connect("activate", self.menu_activate_cb, fileObj)
         return itemVerify,
@@ -112,11 +110,10 @@ class DettachMenuProvider(nautilus.MenuProvider):
         subprocess.Popen(['python', '/usr/bin/gost-crypto-gui.py', '-dettach', filename])
 
 
-class DecryptMenuProvider(nautilus.MenuProvider):
-    # Nautilus crashes if a plugin doesn't implement the __init__ method.
-    # See Bug #374958
+class DecryptMenuProvider(GObject.GObject, Caja.MenuProvider):
+
     def __init__(self):
-        logging.basicConfig(filename='/tmp/decrypt-nautilus-debug', level=logging.DEBUG)
+        pass
 
     def get_file_items(self, window, files):
         if len(files) != 1:
@@ -131,9 +128,9 @@ class DecryptMenuProvider(nautilus.MenuProvider):
         if filename[-3:] != 'enc':
             return
 
-        itemDecrypt = nautilus.MenuItem('DecryptMenuProvider::Decrypt',
-                                        'Расшифровать',
-                                        'Расшифровать файл %s' % filename)
+        itemDecrypt = Caja.MenuItem(name='DecryptMenuProvider::Decrypt',
+                                        label='Расшифровать',
+                                        tip='Расшифровать файл %s' % filename)
 
         itemDecrypt.connect("activate", self.menu_activate_cb, fileObj)
         return itemDecrypt,
@@ -143,11 +140,10 @@ class DecryptMenuProvider(nautilus.MenuProvider):
         subprocess.Popen(['python', '/usr/bin/gost-crypto-gui.py', '-decr', filename])
 
 
-class SignMenuProvider(nautilus.MenuProvider):
-    # Nautilus crashes if a plugin doesn't implement the __init__ method.
-    # See Bug #374958
+class SignMenuProvider(GObject.GObject, Caja.MenuProvider):
+
     def __init__(self):
-        logging.basicConfig(filename='/tmp/sign-nautilus-debug', level=logging.DEBUG)
+        pass
 
     def get_file_items(self, window, files):
         if len(files) != 1:
@@ -160,9 +156,9 @@ class SignMenuProvider(nautilus.MenuProvider):
             return
         filename = urllib.unquote(fileObj.get_uri())[7:]
 
-        itemSign = nautilus.MenuItem('SignMenuProvider::Encrypt',
-                                     'Подписать',
-                                     'Подписать файл %s' % filename)
+        itemSign = Caja.MenuItem(name='SignMenuProvider::Encrypt',
+                                     label='Подписать',
+                                     tip='Подписать файл %s' % filename)
 
         itemSign.connect("activate", self.menu_activate_cb, fileObj)
         return itemSign,
@@ -172,11 +168,10 @@ class SignMenuProvider(nautilus.MenuProvider):
         subprocess.Popen(['python', '/usr/bin/gost-crypto-gui.py', '-sign', filename])
 
 
-class EncryptMenuProvider(nautilus.MenuProvider):
-    # Nautilus crashes if a plugin doesn't implement the __init__ method.
-    # See Bug #374958
+class EncryptMenuProvider(GObject.GObject, Caja.MenuProvider):
+
     def __init__(self):
-        logging.basicConfig(filename='/tmp/encrypt-nautilus-debug', level=logging.DEBUG)
+        pass
 
     def get_file_items(self, window, files):
         if len(files) != 1:
@@ -189,9 +184,9 @@ class EncryptMenuProvider(nautilus.MenuProvider):
             return
         filename = urllib.unquote(fileObj.get_uri())[7:]
 
-        itemEncrypt = nautilus.MenuItem('EncryptMenuProvider::Encrypt',
-                                        'Зашифровать',
-                                        'Зашифровать файл %s' % filename)
+        itemEncrypt = Caja.MenuItem(name='EncryptMenuProvider::Encrypt',
+                                        label='Зашифровать',
+                                        tip='Зашифровать файл %s' % filename)
 
         itemEncrypt.connect("activate", self.menu_activate_cb, fileObj)
         return itemEncrypt,

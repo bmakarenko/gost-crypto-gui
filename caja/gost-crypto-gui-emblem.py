@@ -46,11 +46,11 @@ THE SOFTWARE.
 import ConfigParser
 import os.path
 import gostcryptogui
-import nautilus
+from gi.repository import Caja, GObject
 import urllib
 
 
-class SignatureCheckProvider(nautilus.InfoProvider):
+class SignatureCheckProvider(GObject.GObject, Caja.InfoProvider):
     def __init__(self):
         pass
 
