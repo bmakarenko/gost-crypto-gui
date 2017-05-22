@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2016 Борис Макаренко
+Copyright (c) 2017 Борис Макаренко
 
 Данная лицензия разрешает лицам, получившим копию данного программного
 обеспечения и сопутствующей документации (в дальнейшем именуемыми «Программное
@@ -23,7 +23,7 @@ Copyright (c) 2016 Борис Макаренко
 ЧИСЛЕ, ПРИ ДЕЙСТВИИ КОНТРАКТА, ДЕЛИКТЕ ИЛИ ИНОЙ СИТУАЦИИ, ВОЗНИКШИМ ИЗ-ЗА
 ИСПОЛЬЗОВАНИЯ ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ ИЛИ ИНЫХ ДЕЙСТВИЙ С ПРОГРАММНЫМ ОБЕСПЕЧЕНИЕМ..
 
-Copyright (c) 2016 Boris Makarenko
+Copyright (c) 2017 Boris Makarenko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,19 +49,37 @@ import subprocess
 import re
 
 
+def nongui(fun):
+    """Decorator running the function in non-gui thread while
+    processing the gui events."""
+    from multiprocessing.pool import ThreadPool
+    from PyQt4.QtGui import QApplication
+
+    def wrap(*args, **kwargs):
+        pool = ThreadPool(processes=1)
+        async = pool.apply_async(fun, args, kwargs)
+        while not async.ready():
+            async.wait(0.01)
+            QApplication.processEvents()
+        return async.get()
+
+    return wrap
+
 # Класс CryptoPro предназнаечен для выполнения криптографических операций над файлами средствами КриптоПро CSP
 
 
 class CryptoPro:
     arch = str
 
+    # В конструкторе класса производится проверка текущей архитектуры и доступность
+    # исполняемых файлов Крипто Про
     def __init__(self):
         if platform.machine() == 'x86_64':
             self.arch = 'amd64'
         elif platform.machine() == 'i686':
             self.arch = 'ia32'
         else:
-            raise Exception(u'Невозможно определить текущую архитектуру.')
+            raise Exception(u'Текущая архитектура %s не поддерживается' % platform.machine())
         if not os.path.exists('/opt/cprocsp/bin/%s/certmgr' % self.arch) or not os.path.exists('/opt/cprocsp/bin/%s/cryptcp' % self.arch):
             raise Exception(u'СКЗИ Крипто Про CSP или некоторые его компоненты не установлены.')
 
@@ -158,6 +176,7 @@ class CryptoPro:
     # Путь до файла должен быть абсолютным. Подписанный файл сохраняется в той же директории с расширением '.sig'
     # Возвращает кортеж с результатом выполнения (True) и предупреждением(если имеется)
     # TODO Сделать возможность добавления подписи
+    @nongui
     def sign(self, thumbprint, filepath, encoding, dettached=False):
         # Исправляем криптопрошные крокозябры
         new_env = dict(os.environ)
@@ -190,6 +209,7 @@ class CryptoPro:
     # указывающего была ли проверена цепочка сертификатов или нет. True - была, False - нет
     # TODO Сделать возможность проверки отсоединенной подписи
     # TODO Сделать возможность проверки нескольких подписей в одном файле
+    @nongui
     def verify(self, filepath, dettach=False):
         # Если это не файл подписи, проверяем лежащий рядом файл с расширением '.sig'
         if not filepath[-4:] == '.sig':
@@ -226,6 +246,7 @@ class CryptoPro:
     # Метод encrypt шифрует заданный файл(filepath), при помощи SHA-отпечатка сертификата
     #  или имени файла сертификата (thumbprint), и используя заданную кодировку(encoding): DER или BASE64
     # Путь до файла должен быть абсолютным. Зашифрованный файл сохраняется в той же директории с расширением '.enc'
+    @nongui
     def encrypt(self, thumbprint, filepath, encoding):
         # Исправляем криптопрошные крокозябры
         new_env = dict(os.environ)
@@ -258,6 +279,7 @@ class CryptoPro:
 
     # Метод decrypt расшифровывает заданный файл(filepath) при помощи SHA-отпечатка сертификата(thumbprint)
     # Расшифрованный файл сохраняется в той же директории, лишаясь расширения '.enc'
+    @nongui
     def decrypt(self, thumbprint, filepath):
         if not filepath[-4:] == '.enc':
             pass

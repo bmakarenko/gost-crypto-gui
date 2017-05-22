@@ -225,7 +225,14 @@ class Window(QtGui.QMainWindow):
             thumbprint = choose.getCertificate()
         else:
             return
-        for filename in file_names:
+        progressDialog = QtGui.QProgressDialog("", u"Отмена", 0, 0, self)
+        progressDialog.setValue(-1)
+        progressDialog.show()
+        for index, filename in enumerate(file_names, start=1):
+            progressDialog.setLabelText(u'Подпись файла %s из %s<br>Текущий файл: %s' % (index, len(file_names),
+                                                                                         filename.split('/')[-1]))
+            if progressDialog.wasCanceled():
+                return
             try:
                 result = CryptoPro().sign(thumbprint, unicode(filename), self.encoding, self.dettached)
                 if result[0]:
@@ -235,6 +242,7 @@ class Window(QtGui.QMainWindow):
                     QtGui.QMessageBox().warning(self, u"Предупреждение", result[1])
             except Exception as error:
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+        progressDialog.close()
 
     def verify(self, dettach=False, *args):
         if self.sender():
@@ -243,7 +251,14 @@ class Window(QtGui.QMainWindow):
                 return
         else:
             file_names = args
-        for filename in file_names:
+        progressDialog = QtGui.QProgressDialog("", u"Отмена", 0, 0, self)
+        progressDialog.setValue(-1)
+        progressDialog.show()
+        for index, filename in enumerate(file_names, start=1):
+            progressDialog.setLabelText(u'Проверка подписи файла %s из %s<br>Текущий файл: %s' % (index, len(file_names),
+                                                                                         filename.split('/')[-1]))
+            if progressDialog.wasCanceled():
+                return
             try:
                 signer, chain, revoked, expired = CryptoPro().verify(unicode(filename), dettach)
                 cert_view = ViewCert()
@@ -279,6 +294,8 @@ class Window(QtGui.QMainWindow):
                 cert_view.exec_()
             except Exception as error:
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+        progressDialog.close()
+
 
     def encrypt(self, *args):
         if self.sender():
@@ -300,7 +317,14 @@ class Window(QtGui.QMainWindow):
                     return
         else:
             return
-        for filename in file_names:
+        progressDialog = QtGui.QProgressDialog("", u"Отмена", 0, 0, self)
+        progressDialog.setValue(-1)
+        progressDialog.show()
+        for index, filename in enumerate(file_names, start=1):
+            progressDialog.setLabelText(u'Шифрование файла %s из %s<br>Текущий файл: %s' % (index, len(file_names),
+                                                                                         filename.split('/')[-1]))
+            if progressDialog.wasCanceled():
+                return
             try:
                 encrypted, chain, revoked, expired = CryptoPro().encrypt(unicode(thumbprint), unicode(filename), self.encoding)
                 if encrypted:
@@ -314,6 +338,7 @@ class Window(QtGui.QMainWindow):
                     QtGui.QMessageBox().information(self, u"Cообщение", message)
             except Exception as error:
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+        progressDialog.close()
 
     def decrypt(self, *args):
         if self.sender():
@@ -331,7 +356,14 @@ class Window(QtGui.QMainWindow):
             thumbprint = choose.getCertificate()
         else:
             return
-        for filename in file_names:
+        progressDialog = QtGui.QProgressDialog("", u"Отмена", 0, 0, self)
+        progressDialog.setValue(-1)
+        progressDialog.show()
+        for index, filename in enumerate(file_names, start=1):
+            progressDialog.setLabelText(u'Расшифровка файла %s из %s<br>Текущий файл: %s' % (index, len(file_names),
+                                                                                         filename.split('/')[-1]))
+            if progressDialog.wasCanceled():
+                return
             try:
                 decrypted, chain, revoked, expired = CryptoPro().decrypt(thumbprint, unicode(filename))
                 if decrypted:
@@ -345,6 +377,8 @@ class Window(QtGui.QMainWindow):
                     QtGui.QMessageBox().information(self, u"Cообщение", message)
             except Exception as error:
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
+        progressDialog.close()
+
 
     def aboutProgram(self):
         QtGui.QMessageBox().about(self, u"О программе",
