@@ -154,7 +154,7 @@ class CryptoPro:
                                    stdout=subprocess.PIPE)
         output = certmgr.communicate()[0]
         m = re.findall(
-            r'\d+-{7}\nIssuer.*?: (.+?)\n.*?Subject.*?: (.+?)\n.*?SHA1 Hash.*?0x(.+?)\nNot valid before.*?(\d.+?)UTC\nNot valid after.*?(\d.+?)UTC.+?PrivateKey Link.*?(Yes|No).*?\n',
+            r'\d+-{7}\nIssuer.*?: (.+?)\n.*?Subject.*?: (.+?)\n.*?SHA1 Hash.*?: 0x(.+?)\n.*?Not valid before.*?(\d.+?)UTC\n.*?Not valid after.*?(\d.+?)UTC\n.*?PrivateKey Link.*?(Yes|No).*?\n',
             output, re.MULTILINE + re.DOTALL)
         for cert in m:
             issuerDN = dict(re.findall(ur'([A-Za-z0-9\.]+?)=([\xab\xbb\(\)\w \.\,0-9@\-\#\/\"\/]+|\"(?:\\.|[^\"])*\")(?:, |$)',

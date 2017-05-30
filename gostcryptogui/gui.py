@@ -73,7 +73,8 @@ class ChooseCert(QtGui.QDialog):
         if not withsecret:
             cert_list.append(u'Из файла...')
         for line in certs_data:
-            if withsecret and line['secretKey'] == 'Yes':
+            if withsecret:
+                if line['secretKey'] == 'Yes':
                     cert_list.append(
                         u'%s, \nВыдан:%s, \nХэш SHA1: %s\nНе действителен до: %s\nНе действителен после: %s' % (
                             line['subjectCN'], line['issuerCN'], line['thumbprint'], line['notValidBefore'],
