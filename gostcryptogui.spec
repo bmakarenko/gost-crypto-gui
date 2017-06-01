@@ -32,13 +32,7 @@ Url: http://github.com/bmakarenko/gost-crypto-gui
 BuildRequires: python-setuptools
 
 Requires: PyQt4
-Requires: python-caja
-Requires: python-setuptools
-%ifarch x86_64 amd64
-Requires: lsb-cprocsp-capilite-64
-%else
-Requires: lsb-cprocsp-capilite
-%endif
+Requires: xdg-utils
 
 %description
 A PyQt GUI for performing cryptographic operations over files using GOST algorithms
