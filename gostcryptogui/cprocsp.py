@@ -157,10 +157,10 @@ class CryptoPro:
             r'\d+-{7}\nIssuer.*?: (.+?)\n.*?Subject.*?: (.+?)\n.*?SHA1 Hash.*?: 0x(.+?)\n.*?Not valid before.*?(\d.+?)UTC\n.*?Not valid after.*?(\d.+?)UTC\n.*?PrivateKey Link.*?(Yes|No).*?\n',
             output, re.MULTILINE + re.DOTALL)
         for cert in m:
-            issuerDN = dict(re.findall(ur'([A-Za-z0-9\.]+?)=([\xab\xbb\(\)\w \.\,0-9@\-\#\/\"\/]+|\"(?:\\.|[^\"])*\")(?:, |$)',
+            issuerDN = dict(re.findall(ur'([A-Za-z0-9\.]+?)=([\xab\xbb\(\)\w \.\,0-9@\-\#\/\"\/\']+|\"(?:\\.|[^\"])*\")(?:, |$)',
                                        cert[0].decode('utf-8'), re.UNICODE))
             issuerCN = issuerDN['CN']
-            subjectDN = dict(re.findall(ur'([A-Za-z0-9\.]+?)=([\xab\xbb\(\)\w \.\,0-9@\-\#\/\"\/]+|\"(?:\\.|[^\"])*\")(?:, |$)',
+            subjectDN = dict(re.findall(ur'([A-Za-z0-9\.]+?)=([\xab\xbb\(\)\w \.\,0-9@\-\#\/\"\/\']+|\"(?:\\.|[^\"])*\")(?:, |$)',
                                         cert[1].decode('utf-8'), re.UNICODE))
             subjectCN = subjectDN['CN']
             secretKey = cert[5]
