@@ -45,6 +45,7 @@ THE SOFTWARE.
 """
 import os
 import platform
+import shutil
 import subprocess
 import re
 
@@ -82,6 +83,9 @@ class CryptoPro:
             raise Exception(u'Текущая архитектура %s не поддерживается' % platform.machine())
         if not os.path.exists('/opt/cprocsp/bin/%s/certmgr' % self.arch) or not os.path.exists('/opt/cprocsp/bin/%s/cryptcp' % self.arch):
             raise Exception(u'СКЗИ Крипто Про CSP или некоторые его компоненты не установлены.')
+        # КОСТЫЛЬ: Создаем временную директорию для хранения отсоединенных подписей
+        if not os.path.exists('/tmp/gost-crypto-gui'):
+            os.makedirs('/tmp/gost-crypto-gui')
 
     # Метод error_description принимает код ошибки и возвращает её описание. Если такой ошибки в словаре нет,
     # то код ошибки возвращается обратно
@@ -184,17 +188,23 @@ class CryptoPro:
 
         if encoding == 'der':
             cryptcp = subprocess.Popen(['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-signf' if dettached else '-sign',
-                                        '-thumbprint', thumbprint, '-der', filepath],
+                                         '-cert' if dettached else None, '-thumbprint', thumbprint, '-der', filepath],
                                        cwd=os.path.dirname(filepath), stdout=subprocess.PIPE, stdin=subprocess.PIPE, env=new_env)
         else:
             cryptcp = subprocess.Popen(['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-signf' if dettached else '-sign',
-                                        '-thumbprint', thumbprint, filepath],
+                                        '-cert' if dettached else None, '-thumbprint', thumbprint, filepath],
                                        cwd=os.path.dirname(filepath), stdout=subprocess.PIPE, stdin=subprocess.PIPE, env=new_env)
         # Согласиться
         cryptcp.stdin.write('Y')
         output = cryptcp.stdout.read()
         errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
                               re.MULTILINE + re.DOTALL).groupdict()['errorcode']
+        # КОСТЫЛЬ переименовываем отсоединенные подписи из sgn в sig
+        if dettached:
+            try:
+                os.rename(filepath+'.sgn', filepath+'.sig')
+            except:
+                pass
         if not errorcode == '0':
             raise Exception(self.error_description(errorcode))
         # Проверяем наличие в выводе сообщения об ошибке проверки цепочки сертификатов
@@ -211,6 +221,7 @@ class CryptoPro:
     # TODO Сделать возможность проверки нескольких подписей в одном файле
     @nongui
     def verify(self, filepath, dettach=False):
+        print filepath
         # Если это не файл подписи, проверяем лежащий рядом файл с расширением '.sig'
         if not filepath[-4:] == '.sig':
             filepath += '.sig'
@@ -228,6 +239,21 @@ class CryptoPro:
         # Согласиться
         cryptcp.stdin.write('Y')
         output = cryptcp.stdout.read()
+
+        errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
+                              re.MULTILINE + re.DOTALL).groupdict()['errorcode']
+
+        # КОСТЫЛЬ если подпись оказалась отсоединенной, копируем её в tmp и проверяем при помощи -vsignf
+        if errorcode == '0x00000057':
+            tmpname=r'/tmp/gost-crypto-gui/'+filepath.split('/')[-1][:-3]+'sgn'
+            shutil.copy(filepath, tmpname)
+            cryptcp = subprocess.Popen(['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-vsignf',
+                                        '-dir', '/tmp/gost-crypto-gui/', '-f', tmpname, filepath[:-4]],
+                                       stdout=subprocess.PIPE, stdin=subprocess.PIPE, env=new_env, shell=False)
+            cryptcp.stdin.write('Y')
+            cryptcp.stdin.write('Y')
+            output = cryptcp.stdout.read()
+
         chainisverified = ('The certificate revocation status or one of the certificates in the certificate chain is'
                            ' unknown.' not in output) \
                           and ('Certificate chain is not checked for this certificate' not in output)

@@ -116,10 +116,11 @@ class ResultDialog(QtGui.QDialog):
 
     filename = str
     result = str
+    dettached = False
 
-    def __init__(self, filename, result, message, parent=None):
+    def __init__(self, filename, result, message, parent=None, dettached=False):
         super(ResultDialog, self).__init__(parent)
-        self.filename, self.result = filename, result
+        self.filename, self.result, self.dettached = filename, result, dettached
         msgBox = QtGui.QMessageBox()
         closeButton = QtGui.QPushButton(u'Закрыть')
         sendButton = QtGui.QPushButton(u'Отправить по почте')
@@ -133,8 +134,12 @@ class ResultDialog(QtGui.QDialog):
         self.connect(showButton, QtCore.SIGNAL('clicked()'), self.showFile)
         ret = msgBox.exec_()
 
+    # Если создавалась отсоединенная подпись, отправить и оригинал
     def send(self):
-        subprocess.Popen(['xdg-email', '--attach', self.result])
+        if self.dettached:
+            subprocess.Popen(['xdg-email', '--attach', self.result, '--attach', self.filename])
+        else:
+            subprocess.Popen(['xdg-email', '--attach', self.result])
 
     def showFile(self):
         subprocess.Popen(['xdg-open', '/'.join(self.result.split('/')[:-1])])
@@ -266,12 +271,12 @@ class Window(QtGui.QMainWindow):
                 message = ''
                 if result[0]:
                     message = u"Файл %s успешно подписан.\n\nПодписанный файл: %s" % \
-                              (unicode(filename), unicode(filename + ('.sgn' if self.dettached else '.sig')))
+                              (unicode(filename), unicode(filename + '.sig'))
                 if result[1]:
                     message += u"\n\nПредупреждение: %s" % result[1]
                 progressDialog.hide()
-                ResultDialog(unicode(filename), unicode(filename + ('.sgn' if self.dettached else '.sig')),
-                             message).show()
+                ResultDialog(unicode(filename), unicode(filename + '.sig'),
+                             message, dettached=self.dettached).show()
             except Exception as error:
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
         progressDialog.close()
