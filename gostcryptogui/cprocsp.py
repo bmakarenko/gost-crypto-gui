@@ -186,14 +186,17 @@ class CryptoPro:
         new_env = dict(os.environ)
         new_env['LANG'] = 'en_US.UTF-8'
 
-        if encoding == 'der':
-            cryptcp = subprocess.Popen(['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-signf' if dettached else '-sign',
-                                         '-cert' if dettached else None, '-thumbprint', thumbprint, '-der', filepath],
-                                       cwd=os.path.dirname(filepath), stdout=subprocess.PIPE, stdin=subprocess.PIPE, env=new_env)
+        cryptcp_args = ['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-thumbprint', thumbprint, filepath]
+        if dettached:
+            cryptcp_args.insert(1, '-signf')
+            cryptcp_args.insert(2, '-cert')
         else:
-            cryptcp = subprocess.Popen(['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-signf' if dettached else '-sign',
-                                        '-cert' if dettached else None, '-thumbprint', thumbprint, filepath],
-                                       cwd=os.path.dirname(filepath), stdout=subprocess.PIPE, stdin=subprocess.PIPE, env=new_env)
+            cryptcp_args.insert(1, '-sign')
+        if encoding == 'der':
+            cryptcp_args.insert(-1, '-der')
+
+        cryptcp = subprocess.Popen(cryptcp_args, cwd=os.path.dirname(filepath), stdout=subprocess.PIPE, stdin=subprocess.PIPE, env=new_env)
+
         # Согласиться
         cryptcp.stdin.write('Y')
         output = cryptcp.stdout.read()
@@ -217,11 +220,9 @@ class CryptoPro:
     # Если требуется при этом отсоединить подпись от файла, указываем параметр dettach=True
     # Возвращает кортеж, состоящий из словаря сертификата и булева значения
     # указывающего была ли проверена цепочка сертификатов или нет. True - была, False - нет
-    # TODO Сделать возможность проверки отсоединенной подписи
     # TODO Сделать возможность проверки нескольких подписей в одном файле
     @nongui
     def verify(self, filepath, dettach=False):
-        print filepath
         # Если это не файл подписи, проверяем лежащий рядом файл с расширением '.sig'
         if not filepath[-4:] == '.sig':
             filepath += '.sig'
