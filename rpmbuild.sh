@@ -22,7 +22,7 @@ cp nautilus/gost-crypto-gui-emblem.py ~/rpmbuild/SOURCES/
 cp nautilus-gostcryptogui.spec ~/rpmbuild/SPEC/
 rpmbuild -ba ~/rpmbuild/SPEC/nautilus-gostcryptogui.spec
 
-cp caja/gost-crypto-gui-menu.py ~/rpmbuild/SOURCES/
-cp caja/gost-crypto-gui-emblem.py ~/rpmbuild/SOURCES/
-cp caja-gostcryptogui.spec ~/rpmbuild/SPEC/
-rpmbuild -ba ~/rpmbuild/SPEC/caja-gostcryptogui.spec
+#cp caja/gost-crypto-gui-menu.py ~/rpmbuild/SOURCES/
+#cp caja/gost-crypto-gui-emblem.py ~/rpmbuild/SOURCES/
+#cp caja-gostcryptogui.spec ~/rpmbuild/SPEC/
+#rpmbuild -ba ~/rpmbuild/SPEC/caja-gostcryptogui.spec

@@ -27,8 +27,8 @@ Caja plugins for gost-crypto-gui
 
 %install
 mkdir -p %{buildroot}/%{_datadir}/caja-python/extensions
-%{__install} -m 0755 %{SOURCE3} %{buildroot}%{_datadir}/caja-python/extensions/gost-crypto-gui-menu.py
-%{__install} -m 0755 %{SOURCE3} %{buildroot}%{_datadir}/caja-python/extensions/gost-crypto-gui-emblem.py
+%{__install} -m 0755 %{SOURCE0} %{buildroot}%{_datadir}/caja-python/extensions/gost-crypto-gui-menu.py
+%{__install} -m 0755 %{SOURCE1} %{buildroot}%{_datadir}/caja-python/extensions/gost-crypto-gui-emblem.py
 python -m py_compile %{buildroot}%{_libdir}/caja-python/extensions/gost-crypto-gui-menu.py
 python -m py_compile %{buildroot}%{_libdir}/caja-python/extensions/gost-crypto-gui-emblem.py
 
