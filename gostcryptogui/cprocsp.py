@@ -152,6 +152,7 @@ class CryptoPro:
         except KeyError:
             return error
 
+    # TODO Показывать алгоритмы подписи и открытого ключа
     # Генератор get_store_certs выдает найденные в заданном хранилище сертификаты в виде словарей
     def get_store_certs(self, store):
         certmgr = subprocess.Popen(['/opt/cprocsp/bin/%s/certmgr' % self.arch, '-list', '-store', store],

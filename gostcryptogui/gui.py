@@ -45,6 +45,8 @@ THE SOFTWARE.
 """
 import ConfigParser
 
+from datetime import datetime
+
 from mainwindow import *
 from cprocsp import *
 from selectcert import *
@@ -58,6 +60,35 @@ class ViewCert(QtGui.QDialog):
         self.ui.setupUi(self)
 
 
+class HTMLDelegate(QtGui.QStyledItemDelegate):
+
+    def paint(self, painter, option, index):
+        if option.state & QtGui.QStyle.State_Selected:
+            painter.fillRect(option.rect, option.palette.highlight())
+        model = index.model()
+        record = model.stringList()[index.row()]
+        doc = QtGui.QTextDocument(self)
+
+        doc.setHtml(record)
+        doc.setTextWidth(option.rect.width())
+        ctx = QtGui.QAbstractTextDocumentLayout.PaintContext()
+
+        painter.save()
+        painter.translate(option.rect.topLeft())
+        painter.setClipRect(option.rect.translated(-option.rect.topLeft()))
+        dl = doc.documentLayout()
+        dl.draw(painter, ctx)
+        painter.restore()
+
+    def sizeHint(self, option, index):
+        model = index.model()
+        record = model.stringList()[index.row()]
+        doc = QtGui.QTextDocument(self)
+        doc.setHtml(record)
+        doc.setTextWidth(option.rect.width())
+        return QtCore.QSize(doc.idealWidth(), doc.size().height())
+
+# TODO Показывать алгоритмы подписи и открытого ключа
 class ChooseCert(QtGui.QDialog):
     cert = str
     certs_hashes = dict
@@ -71,23 +102,28 @@ class ChooseCert(QtGui.QDialog):
         cert_list = QtCore.QStringList()
         certs_data = CryptoPro().get_store_certs('uMy')
         if not withsecret:
-            cert_list.append(u'Из файла...')
+            cert_list.append(u'<i>Из файла...</i>')
         for line in certs_data:
+            cert_html = u'<b>%s</b>, <br>Выдан:%s, <br>Хэш SHA1: %s<br>' % (
+            line['subjectCN'], line['issuerCN'], line['thumbprint'])
+            if datetime.strptime(line['notValidBefore'], '%d/%m/%Y  %H:%M:%S ') > datetime.utcnow():
+                cert_html += u'Не действителен до: <font color=red><b>%s</b></font><br>' % line['notValidBefore']
+            else:
+                cert_html += u'Не действителен до: %s<br>' % line['notValidBefore']
+            if datetime.strptime(line['notValidAfter'], '%d/%m/%Y  %H:%M:%S ') < datetime.utcnow():
+                cert_html += u'Не действителен после: <font color=red><b>%s</b></font><br>' % line['notValidAfter']
+            else:
+                cert_html += u'Не действителен после: %s<br>' % line['notValidAfter']
             if withsecret:
                 if line['secretKey'] == 'Yes':
-                    cert_list.append(
-                        u'%s, \nВыдан:%s, \nХэш SHA1: %s\nНе действителен до: %s\nНе действителен после: %s' % (
-                            line['subjectCN'], line['issuerCN'], line['thumbprint'], line['notValidBefore'],
-                            line['notValidAfter']))
+                    cert_list.append(cert_html)
                     self.certs_hashes.append(line)
             else:
-                cert_list.append(
-                    u'%s, \nВыдан:%s, \nХэш SHA1: %s\nНе действителен до: %s\nНе действителен после: %s' % (
-                        line['subjectCN'], line['issuerCN'], line['thumbprint'], line['notValidBefore'],
-                        line['notValidAfter']))
+                cert_list.append(cert_html)
                 self.certs_hashes.append(line)
         model.setStringList(cert_list)
         self.ui.listView.setModel(model)
+        self.ui.listView.setItemDelegate(HTMLDelegate(self))
         self.ui.cancelButton.clicked.connect(self.close)
         self.ui.okButton.setEnabled(False)
         self.ui.okButton.clicked.connect(self.accept)
@@ -214,7 +250,7 @@ class Window(QtGui.QMainWindow):
             self.encoding = config.get('gost-crypto-gui', 'encoding')
             self.signcheck = config.getboolean('gost-crypto-gui', 'signcheck')
             self.dettached = config.getboolean('gost-crypto-gui', 'dettached')
-        except ConfigParser.NoSectionError:
+        except ConfigParser.NoSectionError and ConfigParser.NoOptionError:
             return
         self.ui.action_CSP.setChecked(self.provider == 'cprocsp')
         self.ui.actionOpenSSL.setChecked(self.provider == 'openssl')
@@ -332,7 +368,6 @@ class Window(QtGui.QMainWindow):
             except Exception as error:
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
         progressDialog.close()
-
 
     def encrypt(self, *args):
         if self.sender():

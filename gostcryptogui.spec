@@ -77,9 +77,6 @@ rm -rf $RPM_BUILD_ROOT
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
 %{_bindir}/gost-crypto-gui.py
-%{_datadir}/caja-python/extensions/*.py
-%{_datadir}/caja-python/extensions/*.pyc
-%{_datadir}/caja-python/extensions/*.pyo
 %{_datadir}/pixmaps/gost-crypto-gui.png
 %{_datadir}/applications/gost-crypto-gui.desktop
 %{_datadir}/mime/applications/x-extension-enc.xml
