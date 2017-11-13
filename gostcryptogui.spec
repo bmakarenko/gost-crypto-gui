@@ -43,7 +43,6 @@ python %{SOURCE1} build
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
-mkdir -p %{buildroot}/%{_datadir}/caja-python/extensions
 mkdir -p %{buildroot}/%{_datadir}/pixmaps
 mkdir -p %{buildroot}/%{_datadir}/icons
 mkdir -p %{buildroot}/%{_datadir}/applications

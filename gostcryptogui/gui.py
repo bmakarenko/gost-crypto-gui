@@ -70,6 +70,7 @@ class HTMLDelegate(QtGui.QStyledItemDelegate):
         doc = QtGui.QTextDocument(self)
 
         doc.setHtml(record)
+        doc.setMetaInformation(QtGui.QTextDocument.DocumentUrl, "file:///usr/share/")
         doc.setTextWidth(option.rect.width())
         ctx = QtGui.QAbstractTextDocumentLayout.PaintContext()
 
@@ -104,16 +105,18 @@ class ChooseCert(QtGui.QDialog):
         if not withsecret:
             cert_list.append(u'<i>Из файла...</i>')
         for line in certs_data:
-            cert_html = u'<b>%s</b>, <br>Выдан:%s, <br>Хэш SHA1: %s<br>' % (
-            line['subjectCN'], line['issuerCN'], line['thumbprint'])
+            cert_html = u'<img src="icons/emblem-verified.png" width=22 height=22><b>%s</b> <br>Выдан:%s <br>' \
+                        u'Хэш SHA1: %s<br>' % (line['subjectCN'], line['issuerCN'], line['thumbprint'])
             if datetime.strptime(line['notValidBefore'], '%d/%m/%Y  %H:%M:%S ') > datetime.utcnow():
                 cert_html += u'Не действителен до: <font color=red><b>%s</b></font><br>' % line['notValidBefore']
+                cert_html = cert_html.replace(u'emblem-verified.png', u'emblem-unverified.png')
             else:
                 cert_html += u'Не действителен до: %s<br>' % line['notValidBefore']
             if datetime.strptime(line['notValidAfter'], '%d/%m/%Y  %H:%M:%S ') < datetime.utcnow():
-                cert_html += u'Не действителен после: <font color=red><b>%s</b></font><br>' % line['notValidAfter']
+                cert_html += u'Не действителен после: <font color=red><b>%s</b></font>' % line['notValidAfter']
+                cert_html = cert_html.replace(u'emblem-verified.png', u'emblem-unverified.png')
             else:
-                cert_html += u'Не действителен после: %s<br>' % line['notValidAfter']
+                cert_html += u'Не действителен после: %s' % line['notValidAfter']
             if withsecret:
                 if line['secretKey'] == 'Yes':
                     cert_list.append(cert_html)
@@ -234,7 +237,10 @@ class Window(QtGui.QMainWindow):
         config.set('gost-crypto-gui', 'signcheck', 'True' if self.signcheck else 'False')
         config.set('gost-crypto-gui', 'dettached', 'True' if self.dettached else 'False')
         if not os.path.exists(os.path.expanduser('~/.gost-crypto-gui/config.cfg')):
-            os.makedirs(os.path.expanduser('~/.gost-crypto-gui/'))
+            try:
+                os.makedirs(os.path.expanduser('~/.gost-crypto-gui/'))
+            except OSError:
+                pass
             config.set('gost-crypto-gui', 'provider', 'cprocsp')
             config.set('gost-crypto-gui', 'encoding', 'der')
             config.set('gost-crypto-gui', 'signcheck', 'True')
@@ -250,7 +256,11 @@ class Window(QtGui.QMainWindow):
             self.encoding = config.get('gost-crypto-gui', 'encoding')
             self.signcheck = config.getboolean('gost-crypto-gui', 'signcheck')
             self.dettached = config.getboolean('gost-crypto-gui', 'dettached')
-        except ConfigParser.NoSectionError and ConfigParser.NoOptionError:
+        except ConfigParser.NoSectionError:
+            return
+        except ConfigParser.NoOptionError:
+            return
+        except ConfigParser.MissingSectionHeaderError:
             return
         self.ui.action_CSP.setChecked(self.provider == 'cprocsp')
         self.ui.actionOpenSSL.setChecked(self.provider == 'openssl')
