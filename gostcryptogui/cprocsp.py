@@ -154,12 +154,18 @@ class CryptoPro:
 
     # TODO Показывать алгоритмы подписи и открытого ключа
     # Генератор get_store_certs выдает найденные в заданном хранилище сертификаты в виде словарей
-    def get_store_certs(self, store):
-        certmgr = subprocess.Popen(['/opt/cprocsp/bin/%s/certmgr' % self.arch, '-list', '-store', store],
+    def get_store_certs(self, store=None, crt_file=None):
+        if crt_file:
+            certmgr = subprocess.Popen(['/opt/cprocsp/bin/%s/certmgr' % self.arch, '-list', '-file', crt_file],
+                                       stdout=subprocess.PIPE)
+        elif store:
+            certmgr = subprocess.Popen(['/opt/cprocsp/bin/%s/certmgr' % self.arch, '-list', '-store', store],
                                    stdout=subprocess.PIPE)
+        else:
+            pass
         output = certmgr.communicate()[0]
         m = re.findall(
-            r'\d+-{7}\nIssuer.*?: (.+?)\n.*?Subject.*?: (.+?)\n.*?SHA1 Hash.*?: (?:0x)?(.+?)\n.*?Not valid before.*?(\d.+?)UTC\n.*?Not valid after.*?(\d.+?)UTC\n.*?PrivateKey Link.*?(Yes|No).*?\n',
+            r'\d+-{7}\nIssuer.*?: (.+?)\n.*?Subject.*?: (.+?)\n.*?Serial.*?: (?:0x)?(.+?)\n.*?SHA1 Hash.*?: (?:0x)?(.+?)\n.*?Not valid before.*?(\d.+?)UTC\n.*?Not valid after.*?(\d.+?)UTC\n.*?PrivateKey Link.*?(Yes|No).*?\n',
             output, re.MULTILINE + re.DOTALL)
         for cert in m:
             issuerDN = dict(re.findall(ur'([A-Za-z0-9\.]+?)=([\xab\xbb\(\)\w \.\,0-9@\-\#\/\"\/\']+|\"(?:\\.|[^\"])*\")(?:, |$)',
@@ -168,12 +174,13 @@ class CryptoPro:
             subjectDN = dict(re.findall(ur'([A-Za-z0-9\.]+?)=([\xab\xbb\(\)\w \.\,0-9@\-\#\/\"\/\']+|\"(?:\\.|[^\"])*\")(?:, |$)',
                                         cert[1].decode('utf-8'), re.UNICODE))
             subjectCN = subjectDN['CN']
-            secretKey = cert[5]
-            thumbprint = cert[2]
-            notValidBefore = cert[3]
-            notValidAfter = cert[4]
+            secretKey = cert[6]
+            serial = cert[2]
+            thumbprint = cert[3]
+            notValidBefore = cert[4]
+            notValidAfter = cert[5]
             yield dict(issuerDN=issuerDN, issuerCN=issuerCN, subjectDN=subjectDN, subjectCN=subjectCN,
-                       secretKey=secretKey, thumbprint=thumbprint, notValidBefore=notValidBefore,
+                       secretKey=secretKey, serial=serial, thumbprint=thumbprint, notValidBefore=notValidBefore,
                        notValidAfter=notValidAfter)
 
     # Метод sign выполняет операцию подписи заданного файла(filepath), при помощи заданного SHA-отпечатка

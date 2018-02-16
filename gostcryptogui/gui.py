@@ -101,12 +101,14 @@ class ChooseCert(QtGui.QDialog):
         self.certs_hashes = []
         model = QtGui.QStringListModel()
         cert_list = QtCore.QStringList()
-        certs_data = CryptoPro().get_store_certs('uMy')
+        # Получаем сертификаты из личного хранилища
+        certs_data = CryptoPro().get_store_certs(store='uMy')
+
         if not withsecret:
             cert_list.append(u'<i>Из файла...</i>')
         for line in certs_data:
             cert_html = u'<img src="icons/emblem-verified.png" width=22 height=22><b>%s</b> <br>Выдан:%s <br>' \
-                        u'Хэш SHA1: %s<br>' % (line['subjectCN'], line['issuerCN'], line['thumbprint'])
+                        u'Серийный номер: %s<br>Хэш SHA1: %s<br>' % (line['subjectCN'], line['issuerCN'], line['serial'], line['thumbprint'])
             if datetime.strptime(line['notValidBefore'], '%d/%m/%Y  %H:%M:%S ') > datetime.utcnow():
                 cert_html += u'Не действителен до: <font color=red><b>%s</b></font><br>' % line['notValidBefore']
                 cert_html = cert_html.replace(u'emblem-verified.png', u'emblem-unverified.png')
@@ -140,11 +142,11 @@ class ChooseCert(QtGui.QDialog):
         if index.row() == 0:
             self.cert = 'file'
         else:
-            self.cert = self.certs_hashes[index.row()-1]['thumbprint']
+            self.cert = self.certs_hashes[index.row()-1]
         self.ui.okButton.setEnabled(bool(self.cert))
 
     def select_cert_w_secret(self, index):
-        self.cert = self.certs_hashes[index.row()]['thumbprint']
+        self.cert = self.certs_hashes[index.row()]
         self.ui.okButton.setEnabled(bool(self.cert))
 
     def getCertificate(self):
@@ -301,7 +303,7 @@ class Window(QtGui.QMainWindow):
             QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
             return
         if choose.exec_():
-            thumbprint = choose.getCertificate()
+            cert_info = choose.getCertificate()
         else:
             return
         progressDialog = QtGui.QProgressDialog("", u"Отмена", 0, 0, self)
@@ -313,11 +315,12 @@ class Window(QtGui.QMainWindow):
             if progressDialog.wasCanceled():
                 return
             try:
-                result = CryptoPro().sign(thumbprint, unicode(filename), self.encoding, self.dettached)
+                result = CryptoPro().sign(cert_info['thumbprint'], unicode(filename), self.encoding, self.dettached)
                 message = ''
                 if result[0]:
                     message = u"Файл %s успешно подписан.\n\nПодписанный файл: %s" % \
                               (unicode(filename), unicode(filename + '.sig'))
+                    message += u'Сертификат:\n{p[subjectCN]}\nВыдан: {p[issuerCN]}\nСерийный номер: {p[serial]}\nНе действителен до: {p[notValidBefore]}\nНе действителен после: {p[notValidAfter]}\n\n'.format(p=cert_info)
                 if result[1]:
                     message += u"\n\nПредупреждение: %s" % result[1]
                 progressDialog.hide()
@@ -392,11 +395,14 @@ class Window(QtGui.QMainWindow):
             QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
             return
         if choose.exec_():
-            thumbprint = choose.getCertificate()
-            if thumbprint == 'file':
+            cert_info = choose.getCertificate()
+            if cert_info == 'file':
                 thumbprint = QtGui.QFileDialog().getOpenFileName(self, u"Выберите файл(ы)", "", "*.crt *cer")
                 if not thumbprint:
                     return
+                cert_info = list(CryptoPro().get_store_certs(crt_file=thumbprint))[0]
+            else:
+                thumbprint = cert_info['thumbprint']
         else:
             return
         progressDialog = QtGui.QProgressDialog("", u"Отмена", 0, 0, self)
@@ -411,6 +417,7 @@ class Window(QtGui.QMainWindow):
                 encrypted, chain, revoked, expired = CryptoPro().encrypt(unicode(thumbprint), unicode(filename), self.encoding)
                 if encrypted:
                     message = u'Файл %s успешно зашифрован.\n\nЗашифрованный файл: %s\n\n' % (unicode(filename), unicode(filename)+'.enc')
+                    message += u'Сертификат:\n{p[subjectCN]}\nВыдан: {p[issuerCN]}\nСерийный номер: {p[serial]}\nНе действителен до: {p[notValidBefore]}\nНе действителен после: {p[notValidAfter]}\n\n'.format(p=cert_info)
                     if not chain:
                         message += u'ВНИМАНИЕ: Статус отзыва сертификата не был проверен!\n'
                     if revoked:
@@ -437,7 +444,7 @@ class Window(QtGui.QMainWindow):
             QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
             return
         if choose.exec_():
-            thumbprint = choose.getCertificate()
+            cert_info = choose.getCertificate()
         else:
             return
         progressDialog = QtGui.QProgressDialog("", u"Отмена", 0, 0, self)
@@ -449,7 +456,7 @@ class Window(QtGui.QMainWindow):
             if progressDialog.wasCanceled():
                 return
             try:
-                decrypted, chain, revoked, expired = CryptoPro().decrypt(thumbprint, unicode(filename))
+                decrypted, chain, revoked, expired = CryptoPro().decrypt(cert_info['thumbprint'], unicode(filename))
                 if decrypted:
                     message = u'Файл %s успешно расшифрован.\n\nРасшифрованный файл: %s\n\n' % (unicode(filename), unicode(filename)[:-4])
                     if not chain:
