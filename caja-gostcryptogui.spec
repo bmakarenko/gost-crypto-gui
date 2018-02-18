@@ -38,7 +38,6 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %{_datadir}/caja-python/extensions/*.py
 %{_datadir}/caja-python/extensions/*.pyc
-%{_datadir}/caja-python/extensions/*.pyo
 
 
 %changelog

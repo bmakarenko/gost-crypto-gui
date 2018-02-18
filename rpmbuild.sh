@@ -15,14 +15,17 @@ cp emblem-nochain.png ~/rpmbuild/SOURCES/
 cp emblem-unverified.png ~/rpmbuild/SOURCES/
 cp emblem-verified.png ~/rpmbuild/SOURCES/
 cp setup.py ~/rpmbuild/SOURCES/
-rpmbuild -ba ~/rpmbuild/SPEC/gostcryptogui.spec
+rpmbuild -ba --target i386  ~/rpmbuild/SPEC/gostcryptogui.spec
+rpmbuild -ba --target x86_64  ~/rpmbuild/SPEC/gostcryptogui.spec
 
 cp nautilus/gost-crypto-gui-menu.py ~/rpmbuild/SOURCES/
 cp nautilus/gost-crypto-gui-emblem.py ~/rpmbuild/SOURCES/
 cp nautilus-gostcryptogui.spec ~/rpmbuild/SPEC/
-rpmbuild -ba ~/rpmbuild/SPEC/nautilus-gostcryptogui.spec
+rpmbuild -ba --target i386 ~/rpmbuild/SPEC/nautilus-gostcryptogui.spec
+rpmbuild -ba --target x86_64 ~/rpmbuild/SPEC/nautilus-gostcryptogui.spec
 
-#cp caja/gost-crypto-gui-menu.py ~/rpmbuild/SOURCES/
-#cp caja/gost-crypto-gui-emblem.py ~/rpmbuild/SOURCES/
-#cp caja-gostcryptogui.spec ~/rpmbuild/SPEC/
-#rpmbuild -ba ~/rpmbuild/SPEC/caja-gostcryptogui.spec
+cp caja/gost-crypto-gui-menu.py ~/rpmbuild/SOURCES/
+cp caja/gost-crypto-gui-emblem.py ~/rpmbuild/SOURCES/
+cp caja-gostcryptogui.spec ~/rpmbuild/SPEC/
+rpmbuild -ba --target i386 ~/rpmbuild/SPEC/caja-gostcryptogui.spec
+rpmbuild -ba --target x86_64 ~/rpmbuild/SPEC/caja-gostcryptogui.spec

@@ -318,7 +318,7 @@ class Window(QtGui.QMainWindow):
                 result = CryptoPro().sign(cert_info['thumbprint'], unicode(filename), self.encoding, self.dettached)
                 message = ''
                 if result[0]:
-                    message = u"Файл %s успешно подписан.\n\nПодписанный файл: %s" % \
+                    message = u"Файл %s успешно подписан.\n\nПодписанный файл: %s\n\n" % \
                               (unicode(filename), unicode(filename + '.sig'))
                     message += u'Сертификат:\n{p[subjectCN]}\nВыдан: {p[issuerCN]}\nСерийный номер: {p[serial]}\nНе действителен до: {p[notValidBefore]}\nНе действителен после: {p[notValidAfter]}\n\n'.format(p=cert_info)
                 if result[1]:

@@ -17,7 +17,6 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Prefix: %{_prefix}
 Vendor: Boris Makarenko <bmakarenko90@gmail.com>
 Url: http://github.com/bmakarenko/gost-crypto-gui
-BuildArch: noarch
 
 Requires: gostcryptogui
 Requires: nautilus-python
