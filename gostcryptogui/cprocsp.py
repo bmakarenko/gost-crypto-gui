@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2017 Борис Макаренко
+Copyright (c) 2018 Борис Макаренко
 
 Данная лицензия разрешает лицам, получившим копию данного программного
 обеспечения и сопутствующей документации (в дальнейшем именуемыми «Программное
@@ -23,7 +23,7 @@ Copyright (c) 2017 Борис Макаренко
 ЧИСЛЕ, ПРИ ДЕЙСТВИИ КОНТРАКТА, ДЕЛИКТЕ ИЛИ ИНОЙ СИТУАЦИИ, ВОЗНИКШИМ ИЗ-ЗА
 ИСПОЛЬЗОВАНИЯ ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ ИЛИ ИНЫХ ДЕЙСТВИЙ С ПРОГРАММНЫМ ОБЕСПЕЧЕНИЕМ..
 
-Copyright (c) 2017 Boris Makarenko
+Copyright (c) 2018 Boris Makarenko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -251,6 +251,7 @@ class CryptoPro:
 
         errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
                               re.MULTILINE + re.DOTALL).groupdict()['errorcode']
+        cert_info = self.get_store_certs(crt_file=filepath)
 
         # КОСТЫЛЬ если подпись оказалась отсоединенной, копируем её в tmp и проверяем при помощи -vsignf
         if errorcode == '0x00000057':
@@ -262,6 +263,7 @@ class CryptoPro:
             cryptcp.stdin.write('Y')
             cryptcp.stdin.write('Y')
             output = cryptcp.stdout.read()
+            cert_info = self.get_store_certs(crt_file=tmpname)
 
         chainisverified = ('The certificate revocation status or one of the certificates in the certificate chain is'
                            ' unknown.' not in output) \
@@ -269,14 +271,12 @@ class CryptoPro:
         chainisrevoked = 'Trust for this certificate or one of the certificates in the certificate chain has' \
                          ' been revoked' in output
         certisexpired = 'This certificate or one of the certificates in the certificate chain is not time valid.' in output
-        m = re.search(r'Signer: (?P<signer>.+?)\n.*(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
-                      re.MULTILINE + re.DOTALL)
         errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
                               re.MULTILINE + re.DOTALL).groupdict()['errorcode']
         if not errorcode == '0':
             raise Exception(self.error_description(errorcode))
         else:
-            return m.groupdict(), chainisverified, chainisrevoked, certisexpired
+            return cert_info, chainisverified, chainisrevoked, certisexpired
 
     # Метод encrypt шифрует заданный файл(filepath), при помощи SHA-отпечатка сертификата
     #  или имени файла сертификата (thumbprint), и используя заданную кодировку(encoding): DER или BASE64

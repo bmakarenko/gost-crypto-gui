@@ -331,6 +331,14 @@ class Window(QtGui.QMainWindow):
         progressDialog.close()
 
     def verify(self, dettach=False, *args):
+
+        def add_line(text=None):
+            item = QtGui.QListWidgetItem(cert_view.ui.cert_listview)
+            if text:
+                label = QtGui.QLabel()
+                label.setText(text)
+                cert_view.ui.cert_listview.setItemWidget(item, label)
+
         if self.sender():
             file_names = QtGui.QFileDialog().getOpenFileNames(self, u"Выберите файл(ы)", "", "*.sig")
             if not file_names:
@@ -346,37 +354,33 @@ class Window(QtGui.QMainWindow):
             if progressDialog.wasCanceled():
                 return
             try:
-                signer, chain, revoked, expired = CryptoPro().verify(unicode(filename), dettach)
+                cert_info, chain, revoked, expired = CryptoPro().verify(unicode(filename), dettach)
+                cert_info = list(cert_info)[0]
                 cert_view = ViewCert()
-                item = QtGui.QListWidgetItem(cert_view.ui.cert_listview)
-                label = QtGui.QLabel()
-                label.setText(u'Файл: %s' % unicode(filename))
-                cert_view.ui.cert_listview.setItemWidget(item, label)
-                item = QtGui.QListWidgetItem(cert_view.ui.cert_listview)
-                label = QtGui.QLabel()
-                label.setText(u'<b>Информация о сертификате подписи:</b>:')
-                cert_view.ui.cert_listview.setItemWidget(item, label)
-                for line in signer['signer'].decode('utf-8').split(', '):
-                    item = QtGui.QListWidgetItem(cert_view.ui.cert_listview)
-                    label = QtGui.QLabel()
-                    label.setText(line)
-                    cert_view.ui.cert_listview.setItemWidget(item, label)
-                item = QtGui.QListWidgetItem(cert_view.ui.cert_listview)
-                label = QtGui.QLabel()
+                add_line(u'Файл: %s' % unicode(filename))
+                add_line(u'<b>Информация о сертификате подписи:</b>:')
+                add_line(u'<b>Эмитент</b>:')
+                for field, value in cert_info['issuerDN'].items():
+                    add_line('<b>%s</b>: %s' % (self.translate_cert_fields(field), value))
+                add_line()
+                add_line(u'<b>Субъект</b>:')
+                for field, value in cert_info['subjectDN'].items():
+                    add_line('<b>%s</b>: %s' % (self.translate_cert_fields(field), value))
+                add_line(u'<b>Серийный номер</b>: %s' % cert_info['serial'])
+                not_valid_before = datetime.strptime(cert_info['notValidBefore'], '%d/%m/%Y  %H:%M:%S ')
+                add_line(u'<b>Не действителен до</b>: %s' % datetime.strftime(not_valid_before, '%d.%m.%Y %H:%M:%S'))
+                not_valid_after = datetime.strptime(cert_info['notValidAfter'], '%d/%m/%Y  %H:%M:%S ')
+                add_line(u'<b>Не действителен после</b>: %s' % datetime.strftime(not_valid_after, '%d.%m.%Y %H:%M:%S'))
                 if chain:
-                    label.setText(u'<font color="green"><b>Цепочка сертификатов была проверена.</b></font>')
+                    add_line(u'<font color="green"><b>Цепочка сертификатов была проверена.</b></font>')
                 else:
-                    label.setText(u'<font color="orange"><b>ВНИМАНИЕ: Цепочка сертификатов не была проверена.</b></font>')
-                cert_view.ui.cert_listview.setItemWidget(item, label)
-                item = QtGui.QListWidgetItem(cert_view.ui.cert_listview)
-                label = QtGui.QLabel()
+                    add_line(u'<font color="orange"><b>ВНИМАНИЕ: Цепочка сертификатов не была проверена.</b></font>')
                 if revoked:
-                    label.setText(u'<font color="red"><b>ВНИМАНИЕ: Один или несколько сертификатов в цепочке отозваны!</b></font>')
+                    add_line(u'<font color="red"><b>ВНИМАНИЕ: Один или несколько сертификатов в цепочке отозваны!</b></font>')
                 elif expired:
-                    label.setText(u'<font color="red"><b>ВНИМАНИЕ: Срок действия сертификата истек или еще не наступил!</b></font>')
+                    add_line(u'<font color="red"><b>ВНИМАНИЕ: Срок действия сертификата истек или еще не наступил!</b></font>')
                 elif chain:
-                    label.setText(u'<font color="green"><b>Сертификат действителен.</b></font>')
-                cert_view.ui.cert_listview.setItemWidget(item, label)
+                    add_line(u'<font color="green"><b>Сертификат действителен.</b></font>')
                 cert_view.exec_()
             except Exception as error:
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
@@ -471,6 +475,54 @@ class Window(QtGui.QMainWindow):
                 QtGui.QMessageBox().warning(self, u"Cообщение", u"Произошла ошибка:\n%s" % error)
         progressDialog.close()
 
+    def translate_cert_fields(self, fieldname):
+        fields = {'1.2.840.113549.1.9.2': u'неструктурированное имя',
+                  '1.2.643.5.1.5.2.1.2': u'код должности',
+                  '1.2.643.5.1.5.2.1.1': u'код структурного подразделения ФССП России (ВКСП)',
+                  '1.2.643.5.1.5.2.2.1': u'Полномочия публикации обновлений ПО',
+                  '1.2.643.5.1.5.2.2.2': u'Подсистема АИС ФССП России',
+                  '1.2.643.5.1.24.2.9': u'Главный судебный пристав Российской Федерации',
+                  '1.2.643.5.1.24.2.10': u'Заместитель главного судебного пристава Российской Федерации',
+                  '1.2.643.5.1.24.2.11': u'Главный судебный пристав субъекта Российской Федерации',
+                  '1.2.643.5.1.24.2.12': u'Заместитель главного судебного пристава субъекта Российской Федерации',
+                  '1.2.643.5.1.24.2.13': u'Старший судебный пристав',
+                  '1.2.643.5.1.24.2.14': u'Судебный пристав-исполнитель',
+                  '1.2.643.100.2.1': u'Доступ к СМЭВ (ФЛ)',
+                  '1.2.643.100.2.2': u'Доступ к СМЭВ (ЮЛ)',
+                  '1.2.643.2.2.34.2': u'Временный доступ к Центру Регистрации',
+                  '1.2.643.2.2.34.4': u'Администратор Центра Регистрации КриптоПро УЦ',
+                  '1.2.643.2.2.34.5': u'Оператор Центра Регистрации КриптоПро УЦ',
+                  '1.2.643.2.2.34.6': u'Пользователь центра регистрации КриптоПро УЦ',
+                  '1.2.643.2.2.34.7': u'Центр Регистрации КриптоПро УЦ',
+                  '1.3.6.1.5.5.7.3.1': u'Проверка подлинности сервера',
+                  '1.3.6.1.5.5.7.3.2': u'Проверка подлинности клиента',
+                  '1.3.6.1.5.5.7.3.4': u'Защищенная электронная почта',
+                  '1.3.6.1.5.5.7.3.8': u'Установка штампа времени',
+                  '1.2.643.3.61.502710.1.6.3.4.1.1': u'Администратор организации',
+                  '1.2.643.3.61.502710.1.6.3.4.1.2': u'Уполномоченный специалист',
+                  '1.2.643.3.61.502710.1.6.3.4.1.3': u'Должностное лицо с правом подписи контракта',
+                  '1.2.643.3.61.502710.1.6.3.4.1.4': u'Специалист с правом направления проекта контракта участнику размещения заказа',
+                  'CN': u'общее имя',
+                  'SN': u'фамилия',
+                  'G': u'имя и отчество',
+                  'I': u'инициалы',
+                  'T': u'должность',
+                  'OU': u'структурное подразделение',
+                  'O': u'организация',
+                  'L': u'населенный пункт',
+                  'S': u'субъект РФ',
+                  'C': u'страна',
+                  'E': u'адрес электронной почты',
+                  'INN': u'ИНН',
+                  'OGRN': u'ОГРН',
+                  'SNILS': u'СНИЛС',
+                  'STREET': u'название улицы, номер дома',
+                  'StreetAddress': u'адрес места нахождения',
+                  'Unstructured Name': u'неструктурированное имя'}
+        try:
+            return fields[fieldname]
+        except KeyError:
+            return fieldname
 
     def aboutProgram(self):
         QtGui.QMessageBox().about(self, u"О программе",
