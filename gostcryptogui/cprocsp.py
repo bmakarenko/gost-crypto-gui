@@ -192,7 +192,7 @@ class CryptoPro:
     def sign(self, thumbprint, filepath, encoding, dettached=False):
         # Исправляем криптопрошные крокозябры
         new_env = dict(os.environ)
-        new_env['LANG'] = 'en_US.UTF-8'
+        new_env['LC_ALL'] = 'C'
 
         cryptcp_args = ['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-thumbprint', thumbprint, filepath]
         if dettached:
@@ -216,7 +216,7 @@ class CryptoPro:
                 os.rename(filepath+'.sgn', filepath+'.sig')
             except:
                 pass
-        if not errorcode == '0':
+        if (not errorcode == '0') & (not errorcode == '0x00000000'):
             raise Exception(self.error_description(errorcode))
         # Проверяем наличие в выводе сообщения об ошибке проверки цепочки сертификатов
         elif 'Certificate chain is not checked for this certificate' in output:
@@ -237,7 +237,7 @@ class CryptoPro:
             dettach = False
         # Исправляем криптопрошные крокозябры
         new_env = dict(os.environ)
-        new_env['LANG'] = 'en_US.UTF-8'
+        new_env['LC_ALL'] = 'C'
         if dettach:
             cryptcp = subprocess.Popen(
                 ['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-verify', '-verall', filepath, filepath[:-4]],
@@ -273,7 +273,7 @@ class CryptoPro:
         certisexpired = 'This certificate or one of the certificates in the certificate chain is not time valid.' in output
         errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
                               re.MULTILINE + re.DOTALL).groupdict()['errorcode']
-        if not errorcode == '0':
+        if (not errorcode == '0') & (not errorcode == '0x00000000'):
             raise Exception(self.error_description(errorcode))
         else:
             return cert_info, chainisverified, chainisrevoked, certisexpired
@@ -285,7 +285,7 @@ class CryptoPro:
     def encrypt(self, thumbprint, filepath, encoding):
         # Исправляем криптопрошные крокозябры
         new_env = dict(os.environ)
-        new_env['LANG'] = 'en_US.UTF-8'
+        new_env['LC_ALL'] = 'C'
 
         if encoding == 'der':
             cryptcp = subprocess.Popen(['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-encr', '-der',
@@ -307,7 +307,7 @@ class CryptoPro:
         certisexpired = 'This certificate or one of the certificates in the certificate chain is not time valid.' in output
         errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
                               re.MULTILINE + re.DOTALL).groupdict()['errorcode']
-        if not errorcode == '0':
+        if (not errorcode == '0') & (not errorcode == '0x00000000'):
             raise Exception(self.error_description(errorcode))
         else:
             return True, chainisverified, chainisrevoked, certisexpired
@@ -320,7 +320,7 @@ class CryptoPro:
             pass
         # Исправляем криптопрошные крокозябры
         new_env = dict(os.environ)
-        new_env['LANG'] = 'en_US.UTF-8'
+        new_env['LC_ALL'] = 'C'
 
         cryptcp = subprocess.Popen(['/opt/cprocsp/bin/%s/cryptcp' % self.arch, '-decr',
                                     '-thumbprint', thumbprint, filepath, filepath[:-4]],
@@ -336,7 +336,7 @@ class CryptoPro:
         certisexpired = 'This certificate or one of the certificates in the certificate chain is not time valid.' in output
         errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
                               re.MULTILINE + re.DOTALL).groupdict()['errorcode']
-        if not errorcode == '0':
+        if (not errorcode == '0') & (not errorcode == '0x00000000'):
             raise Exception(self.error_description(errorcode))
         else:
             return True, chainisverified, chainisrevoked, certisexpired
