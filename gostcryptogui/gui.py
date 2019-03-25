@@ -366,11 +366,13 @@ class Window(QtGui.QMainWindow):
                 add_line(u'<b>Субъект</b>:')
                 for field, value in cert_info['subjectDN'].items():
                     add_line('<b>%s</b>: %s' % (self.translate_cert_fields(field), value))
+                add_line()
                 add_line(u'<b>Серийный номер</b>: %s' % cert_info['serial'])
                 not_valid_before = datetime.strptime(cert_info['notValidBefore'], '%d/%m/%Y  %H:%M:%S ')
                 add_line(u'<b>Не действителен до</b>: %s' % datetime.strftime(not_valid_before, '%d.%m.%Y %H:%M:%S'))
                 not_valid_after = datetime.strptime(cert_info['notValidAfter'], '%d/%m/%Y  %H:%M:%S ')
                 add_line(u'<b>Не действителен после</b>: %s' % datetime.strftime(not_valid_after, '%d.%m.%Y %H:%M:%S'))
+                add_line()
                 if chain:
                     add_line(u'<font color="green"><b>Цепочка сертификатов была проверена.</b></font>')
                 else:

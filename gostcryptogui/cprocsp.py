@@ -216,7 +216,7 @@ class CryptoPro:
                 os.rename(filepath+'.sgn', filepath+'.sig')
             except:
                 pass
-        if not errorcode == '0':
+        if not int(errorcode, 0) == 0:
             raise Exception(self.error_description(errorcode))
         # Проверяем наличие в выводе сообщения об ошибке проверки цепочки сертификатов
         elif 'Certificate chain is not checked for this certificate' in output:
@@ -273,7 +273,7 @@ class CryptoPro:
         certisexpired = 'This certificate or one of the certificates in the certificate chain is not time valid.' in output
         errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
                               re.MULTILINE + re.DOTALL).groupdict()['errorcode']
-        if not errorcode == '0':
+        if not int(errorcode, 0) == 0:
             raise Exception(self.error_description(errorcode))
         else:
             return cert_info, chainisverified, chainisrevoked, certisexpired
@@ -307,7 +307,7 @@ class CryptoPro:
         certisexpired = 'This certificate or one of the certificates in the certificate chain is not time valid.' in output
         errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
                               re.MULTILINE + re.DOTALL).groupdict()['errorcode']
-        if not errorcode == '0':
+        if not int(errorcode, 0) == 0:
             raise Exception(self.error_description(errorcode))
         else:
             return True, chainisverified, chainisrevoked, certisexpired
@@ -336,7 +336,7 @@ class CryptoPro:
         certisexpired = 'This certificate or one of the certificates in the certificate chain is not time valid.' in output
         errorcode = re.search(r'(?:ErrorCode: |ReturnCode: )(?P<errorcode>\w+)', output,
                               re.MULTILINE + re.DOTALL).groupdict()['errorcode']
-        if not errorcode == '0':
+        if not int(errorcode, 0) == 0:
             raise Exception(self.error_description(errorcode))
         else:
             return True, chainisverified, chainisrevoked, certisexpired
