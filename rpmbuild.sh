@@ -29,3 +29,9 @@ cp caja/gost-crypto-gui-emblem.py ~/rpmbuild/SOURCES/
 cp caja-gostcryptogui.spec ~/rpmbuild/SPEC/
 rpmbuild -ba --target i386 ~/rpmbuild/SPEC/caja-gostcryptogui.spec
 rpmbuild -ba --target x86_64 ~/rpmbuild/SPEC/caja-gostcryptogui.spec
+
+cp nemo/gost-crypto-gui-menu.py ~/rpmbuild/SOURCES/
+cp nemo/gost-crypto-gui-emblem.py ~/rpmbuild/SOURCES/
+cp nemo-gostcryptogui.spec ~/rpmbuild/SPEC/
+rpmbuild -ba --target i386 ~/rpmbuild/SPEC/nemo-gostcryptogui.spec
+rpmbuild -ba --target x86_64 ~/rpmbuild/SPEC/nemo-gostcryptogui.spec
