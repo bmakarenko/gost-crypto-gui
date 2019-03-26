@@ -2,7 +2,7 @@
 %define version 0.3
 %define unmangled_version 0.3
 %define unmangled_version 0.3
-%define release 1
+%define release 2
 
 Summary: A PyQt GUI for performing cryptographic operations over files using GOST algorithms
 Name: %{name}
@@ -87,6 +87,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/icons/emblem-verified.png
 
 %changelog
+* Tue Mar 26 2019 Boris Makarenko <bmakarenko90@gmail.com> - 0.3-2
+- CryptoPro 4.0 R4 support
+- Nemo support
+
 * Fri Nov 10 2017 Boris Makarenko <bmakarenko90@gmail.com> - 0.3-1
 - CryptoPro 4.0 support
 - Dettached sigatured support
