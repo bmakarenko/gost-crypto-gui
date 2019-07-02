@@ -403,7 +403,7 @@ class Window(QtGui.QMainWindow):
         if choose.exec_():
             cert_info = choose.getCertificate()
             if cert_info == 'file':
-                thumbprint = QtGui.QFileDialog().getOpenFileName(self, u"Выберите файл(ы)", "", "*.crt *cer")
+                thumbprint = unicode(QtGui.QFileDialog().getOpenFileName(self, u"Выберите файл(ы)", "", "*.crt *cer"))
                 if not thumbprint:
                     return
                 cert_info = list(CryptoPro().get_store_certs(crt_file=thumbprint))[0]
