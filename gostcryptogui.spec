@@ -88,6 +88,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/icons/emblem-verified.png
 
 %changelog
+* Fri Sep 13 2019 Boris Makarenko <bmakarenko90@gmail.com> - 0.4-1
+- Save report on signature verification
+- Small fixes
+
 * Tue Mar 26 2019 Boris Makarenko <bmakarenko90@gmail.com> - 0.3-2
 - CryptoPro 4.0 R4 support
 - Nemo support
