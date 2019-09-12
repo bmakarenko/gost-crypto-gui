@@ -46,6 +46,7 @@ THE SOFTWARE.
 from gi.repository import Nemo, GObject
 import urllib
 import subprocess
+import os.path
 
 
 class VerifyMenuProvider(GObject.GObject, Nemo.MenuProvider):
@@ -95,6 +96,9 @@ class DettachMenuProvider(GObject.GObject, Nemo.MenuProvider):
         filename = urllib.unquote(fileObj.get_uri())[7:]
         if filename[-3:] != 'sig':
             return
+        if os.path.isfile(filename[:-4]):
+            return
+
 
         itemVerify = Nemo.MenuItem(name='DettachMenuProvider::Dettach',
                                        label='Отсоединить подпись',

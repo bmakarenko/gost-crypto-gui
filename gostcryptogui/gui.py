@@ -529,7 +529,7 @@ class Window(QtGui.QMainWindow):
     def aboutProgram(self):
         QtGui.QMessageBox().about(self, u"О программе",
                                   u"<b>gost-crypto-gui 0.3</b><br>"
-                                  u"<br>2017г. Борис Макаренко<br>УИТ ФССП России"
+                                  u"<br>2019г. Борис Макаренко<br>УИТ ФССП России"
                                   u"<br>E-mail: <a href='mailto:makarenko@fssprus.ru'>makarenko@fssprus.ru</a>"
                                   u"<br> <a href='mailto:bmakarenko90@gmail.com'>bmakarenko90@gmail.com</a><br><br>"
                                   u"<a href='http://opensource.org/licenses/MIT'>Лицензия MIT</a>")

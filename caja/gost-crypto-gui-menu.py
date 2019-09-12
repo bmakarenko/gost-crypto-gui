@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2016 Борис Макаренко
+Copyright (c) 2019 Борис Макаренко
 
 Данная лицензия разрешает лицам, получившим копию данного программного
 обеспечения и сопутствующей документации (в дальнейшем именуемыми «Программное
@@ -23,7 +23,7 @@ Copyright (c) 2016 Борис Макаренко
 ЧИСЛЕ, ПРИ ДЕЙСТВИИ КОНТРАКТА, ДЕЛИКТЕ ИЛИ ИНОЙ СИТУАЦИИ, ВОЗНИКШИМ ИЗ-ЗА
 ИСПОЛЬЗОВАНИЯ ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ ИЛИ ИНЫХ ДЕЙСТВИЙ С ПРОГРАММНЫМ ОБЕСПЕЧЕНИЕМ..
 
-Copyright (c) 2016 Boris Makarenko
+Copyright (c) 2019 Boris Makarenko
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,6 @@ THE SOFTWARE.
 from gi.repository import Caja, GObject
 import urllib
 import subprocess
-import logging
 import os
 
 
@@ -66,6 +65,8 @@ class VerifyMenuProvider(GObject.GObject, Caja.MenuProvider):
             return
         filename = urllib.unquote(fileObj.get_uri())[7:]
         if filename[-3:] != 'sig':
+            return
+        if os.path.isfile(filename[:-4]):
             return
 
         itemVerify = Caja.MenuItem(name='VerifyMenuProvider::Verify',
