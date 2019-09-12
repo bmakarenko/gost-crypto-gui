@@ -65,6 +65,7 @@ xdg-mime install %{_datadir}/mime/applications/x-extension-sig.xml
 xdg-desktop-menu install --mode system %{_datadir}/applications/gost-crypto-gui.desktop
 xdg-icon-resource install --context mimetypes --mode system --size 256 %{_datadir}/icons/encrypted.png application-x-extension-enc
 xdg-icon-resource install --context mimetypes --mode system --size 256 %{_datadir}/icons/signed.png application-x-extension-sig
+xdg-icon-resource install --context mimetypes --mode system --size 256 %{_datadir}/icons/signed.png application/pgp-signature
 xdg-icon-resource install --size 48 --context emblems %{_datadir}/icons/emblem-nochain.png
 xdg-icon-resource install --size 48 --context emblems %{_datadir}/icons/emblem-unverified.png
 xdg-icon-resource install --size 48 --context emblems %{_datadir}/icons/emblem-verified.png
