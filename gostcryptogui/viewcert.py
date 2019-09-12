@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'viewcert.ui'
 #
-# Created: Sat Oct 22 19:46:13 2016
-#      by: PyQt4 UI code generator 4.10.4
+# Created by: PyQt4 UI code generator 4.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -32,11 +31,17 @@ class Ui_cert_view(object):
         spacerItem = QtGui.QSpacerItem(323, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem, 1, 0, 1, 1)
         self.close_cert_view = QtGui.QPushButton(cert_view)
+        self.close_cert_view.setDefault(True)
         self.close_cert_view.setObjectName(_fromUtf8("close_cert_view"))
-        self.gridLayout.addWidget(self.close_cert_view, 1, 1, 1, 1)
+        self.gridLayout.addWidget(self.close_cert_view, 1, 2, 1, 1)
         self.cert_listview = QtGui.QListWidget(cert_view)
         self.cert_listview.setObjectName(_fromUtf8("cert_listview"))
-        self.gridLayout.addWidget(self.cert_listview, 0, 0, 1, 2)
+        self.gridLayout.addWidget(self.cert_listview, 0, 0, 1, 3)
+        self.saveReport = QtGui.QPushButton(cert_view)
+        self.saveReport.setEnabled(True)
+        self.saveReport.setCheckable(False)
+        self.saveReport.setObjectName(_fromUtf8("saveReport"))
+        self.gridLayout.addWidget(self.saveReport, 1, 1, 1, 1)
 
         self.retranslateUi(cert_view)
         QtCore.QObject.connect(self.close_cert_view, QtCore.SIGNAL(_fromUtf8("clicked()")), cert_view.close)
@@ -45,4 +50,5 @@ class Ui_cert_view(object):
     def retranslateUi(self, cert_view):
         cert_view.setWindowTitle(_translate("cert_view", "Просмотр", None))
         self.close_cert_view.setText(_translate("cert_view", "Закрыть", None))
+        self.saveReport.setText(_translate("cert_view", "Сохранить отчет", None))
 

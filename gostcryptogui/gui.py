@@ -54,10 +54,21 @@ from viewcert import *
 
 
 class ViewCert(QtGui.QDialog):
+    report = str
+
     def __init__(self):
         super(ViewCert, self).__init__()
         self.ui = Ui_cert_view()
         self.ui.setupUi(self)
+        self.ui.saveReport.clicked.connect(self.saveReportDialog)
+
+    def saveReportDialog(self):
+        fileName = QtGui.QFileDialog.getSaveFileName(self, u'Сохранить отчет', '', '(*.txt)')
+        if not fileName:
+            return
+        fileReport = open(fileName, 'w')
+        fileReport.write(self.report)
+        fileReport.close()
 
 
 class HTMLDelegate(QtGui.QStyledItemDelegate):
@@ -354,9 +365,10 @@ class Window(QtGui.QMainWindow):
             if progressDialog.wasCanceled():
                 return
             try:
-                cert_info, chain, revoked, expired = CryptoPro().verify(unicode(filename), dettach)
+                cert_info, chain, revoked, expired, output = CryptoPro().verify(unicode(filename), dettach)
                 cert_info = list(cert_info)[0]
                 cert_view = ViewCert()
+                cert_view.report = output
                 add_line(u'Файл: %s' % unicode(filename))
                 add_line(u'<b>Информация о сертификате подписи:</b>:')
                 add_line(u'<b>Эмитент</b>:')

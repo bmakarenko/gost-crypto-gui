@@ -146,7 +146,8 @@ class CryptoPro:
                   '0x20000322': u'Не удалось проверить серийный номер',
                   '0x20000323': u'Не удалось сохранить серийный номер',
                   '0x20000324': u'Не удалось загрузить серийный номер',
-                  '0x20000325': u'Лицензия просрочена'}
+                  '0x20000325': u'Лицензия просрочена',
+                  '0x0000065b': u'Отсутствует лицензия КриптоПро CSP'}
         try:
             return errors[error]
         except KeyError:
@@ -226,8 +227,9 @@ class CryptoPro:
 
     # Метод verify проверяет подпись файла(filepath).
     # Если требуется при этом отсоединить подпись от файла, указываем параметр dettach=True
-    # Возвращает кортеж, состоящий из словаря сертификата и булева значения
-    # указывающего была ли проверена цепочка сертификатов или нет. True - была, False - нет
+    # Возвращает кортеж, состоящий из словаря сертификата, булева значения
+    # указывающего была ли проверена цепочка сертификатов или нет(True - была, False - нет) и
+    # полный вывод запуска утилиты cryptcp для сохранения
     # TODO Сделать возможность проверки нескольких подписей в одном файле
     @nongui
     def verify(self, filepath, dettach=False):
@@ -276,7 +278,7 @@ class CryptoPro:
         if not int(errorcode, 0) == 0:
             raise Exception(self.error_description(errorcode))
         else:
-            return cert_info, chainisverified, chainisrevoked, certisexpired
+            return cert_info, chainisverified, chainisrevoked, certisexpired, output
 
     # Метод encrypt шифрует заданный файл(filepath), при помощи SHA-отпечатка сертификата
     #  или имени файла сертификата (thumbprint), и используя заданную кодировку(encoding): DER или BASE64

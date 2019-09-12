@@ -104,7 +104,6 @@ rm -rf $RPM_BUILD_ROOT
 - Update Requires and BuildRequires;
 - Update %files. Exclude some files.
 
-
 * Sun Nov 13 2016 Boris Makarenko <bmakarenko90@gmail.com> - 0.2-1
 - Release 0.2
 - Adding emblems on signature files
