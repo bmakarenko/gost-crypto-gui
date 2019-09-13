@@ -41,7 +41,7 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Fri Sep 12 2019 Boris Makarenko <bmakarenko90@gmail.com> - 0.2-1
+* Fri Sep 13 2019 Boris Makarenko <bmakarenko90@gmail.com> - 0.2-1
 - Exclude dettach menu item if there is an original file
 
 * Mon Mar 25 2019 Boris Makarenko <bmakarenko90@gmail.com> - 0.1-1
