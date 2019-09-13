@@ -1,8 +1,8 @@
 %define name gostcryptogui
-%define version 0.3
-%define unmangled_version 0.3
-%define unmangled_version 0.3
-%define release 2
+%define version 0.4
+%define unmangled_version 0.4
+%define unmangled_version 0.4
+%define release 1
 
 Summary: A PyQt GUI for performing cryptographic operations over files using GOST algorithms
 Name: %{name}

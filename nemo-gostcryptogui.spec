@@ -1,7 +1,7 @@
 %define name nemo-gostcryptogui
-%define version 0.1
-%define unmangled_version 0.1
-%define unmangled_version 0.1
+%define version 0.2
+%define unmangled_version 0.2
+%define unmangled_version 0.2
 %define release 1
 
 Summary: Nemo plugins for gost-crypto-gui
@@ -41,5 +41,8 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Sep 12 2019 Boris Makarenko <bmakarenko90@gmail.com> - 0.2-1
+- Exclude dettach menu item if there is an original file
+
 * Mon Mar 25 2019 Boris Makarenko <bmakarenko90@gmail.com> - 0.1-1
 - Derived from main package
