@@ -79,6 +79,8 @@ class CryptoPro:
             self.arch = 'amd64'
         elif platform.machine() == 'i686':
             self.arch = 'ia32'
+        elif  platform.machine() == 'e2k':
+            arch = 'e2k64'
         else:
             raise Exception(u'Текущая архитектура %s не поддерживается' % platform.machine())
         if not os.path.exists('/opt/cprocsp/bin/%s/certmgr' % self.arch) or not os.path.exists('/opt/cprocsp/bin/%s/cryptcp' % self.arch):
